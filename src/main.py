@@ -3,7 +3,7 @@ import warnings
 
 from dateutil.relativedelta import relativedelta
 from tensorflow.python.keras import Input
-from tensorflow.python.keras.layers import Conv2D, BatchNormalization, ReLU, SeparableConv2D, Add, Reshape, Softmax
+from tensorflow.python.keras.layers import Conv2D, BatchNormalization, ReLU, SeparableConv2D, Add
 from tensorflow.python.keras.models import Model
 
 
@@ -90,6 +90,9 @@ class Predictors:
         self.n_classes = n_classes
 
     def __call__(self, base_1, base_2, conv_1, conv_2, conv_3, conv_4, conv_5):
+        return base_1
+        """
+        Under construction
         base_1_cla = Conv2D(filters=self.n_boxes * self.n_classes, kernel_size=(3, 3), padding='same')(base_1)
         base_1_cla = Reshape(target_shape=(base_1_cla.shape[1], base_1_cla.shape[2], self.n_boxes, self.n_classes))(base_1_cla)
         base_1_cla = Softmax(axis=3)(base_1_cla)
@@ -113,6 +116,7 @@ class Predictors:
 
         conv_5_cla = Conv2D(filters=self.n_boxes * self.n_classes, kernel_size=(3, 3), padding='same')(conv_5)
         conv_5_loc = Conv2D(filters=self.n_boxes * 4, kernel_size=(3, 3), padding='same')(conv_5)
+        """
 
 
 class SingleShotDetector:

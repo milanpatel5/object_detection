@@ -3,3 +3,4 @@
 3) Searching for MobileNetV3 [ https://arxiv.org/pdf/1905.02244.pdf ]
 4) What do we learn from single shot object detectors (SSD, YOLOv3), FPN & Focal loss (RetinaNet)? [ https://medium.com/@jonathan_hui/what-do-we-learn-from-single-shot-object-detectors-ssd-yolo-fpn-focal-loss-3888677c5f4d ]
 5) MobileNet version 2 [ https://machinethink.net/blog/mobilenet-v2/ ]
+6) Faster R-CNN: Towards Real-Time ObjectDetection with Region Proposal Networks [ https://arxiv.org/pdf/1506.01497.pdf ]

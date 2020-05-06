@@ -1,10 +1,5 @@
-import time
-import warnings
-
-from dateutil.relativedelta import relativedelta
-from tensorflow.python.keras import Input
-from tensorflow.python.keras.layers import Conv2D, BatchNormalization, ReLU, SeparableConv2D, Add
-from tensorflow.python.keras.models import Model
+import numpy
+from tensorflow.python.keras.layers import Conv2D, BatchNormalization, ReLU, SeparableConv2D, Add, Reshape, Softmax, Concatenate
 
 
 class BottleneckBlock:
@@ -88,66 +83,46 @@ class Predictors:
     def __init__(self, n_boxes, n_classes):
         self.n_boxes = n_boxes
         self.n_classes = n_classes
+        self.default_boxes = [(0, 0), (0, 1), (1, 0), (1, 1), (2, 0), (0, 2), (1, 2), (2, 1), (2, 2)][:n_boxes]
 
-    def __call__(self, base_1, base_2, conv_1, conv_2, conv_3, conv_4, conv_5):
-        return base_1
-        """
-        Under construction
-        base_1_cla = Conv2D(filters=self.n_boxes * self.n_classes, kernel_size=(3, 3), padding='same')(base_1)
-        base_1_cla = Reshape(target_shape=(base_1_cla.shape[1], base_1_cla.shape[2], self.n_boxes, self.n_classes))(base_1_cla)
-        base_1_cla = Softmax(axis=3)(base_1_cla)
-        base_1_loc = Conv2D(filters=self.n_boxes * 4, kernel_size=(3, 3), padding='same')(base_1)
-        base_1_loc = Reshape(target_shape=(base_1_loc.shape[1], base_1_loc.shape[2], self.n_boxes, 4))
+    def __call__(self, *features):
+        predictions = []
+        for feature in features:
+            class_conf = Conv2D(filters=self.n_boxes * self.n_classes, kernel_size=(3, 3), padding='same')(feature)
+            class_conf = Reshape(target_shape=(-1, self.n_classes))(class_conf)
+            class_conf = Softmax()(class_conf)
 
-        base_2_cla = Conv2D(filters=self.n_boxes * self.n_classes, kernel_size=(3, 3), padding='same')(base_2)
-        base_2_loc = Conv2D(filters=self.n_boxes * 4, kernel_size=(3, 3), padding='same')(base_2)
+            loc_var = Conv2D(filters=self.n_boxes * 4, kernel_size=(3, 3), padding='same')(feature)
+            loc_var = Reshape(target_shape=(-1, 4))(loc_var)
+            loc_ref = self.make_boxes(feature.shape[0], feature.shape[1], feature.shape[2])
 
-        conv_1_cla = Conv2D(filters=self.n_boxes * self.n_classes, kernel_size=(3, 3), padding='same')(conv_1)
-        conv_1_loc = Conv2D(filters=self.n_boxes * 4, kernel_size=(3, 3), padding='same')(conv_1)
+            feature_predictions = Concatenate(axis=-1)([class_conf, loc_var, loc_ref])
+            predictions.append(feature_predictions)
 
-        conv_2_cla = Conv2D(filters=self.n_boxes * self.n_classes, kernel_size=(3, 3), padding='same')(conv_2)
-        conv_2_loc = Conv2D(filters=self.n_boxes * 4, kernel_size=(3, 3), padding='same')(conv_2)
+        predictions = Concatenate(axis=1)(predictions)
+        return predictions
 
-        conv_3_cla = Conv2D(filters=self.n_boxes * self.n_classes, kernel_size=(3, 3), padding='same')(conv_3)
-        conv_3_loc = Conv2D(filters=self.n_boxes * 4, kernel_size=(3, 3), padding='same')(conv_3)
-
-        conv_4_cla = Conv2D(filters=self.n_boxes * self.n_classes, kernel_size=(3, 3), padding='same')(conv_4)
-        conv_4_loc = Conv2D(filters=self.n_boxes * 4, kernel_size=(3, 3), padding='same')(conv_4)
-
-        conv_5_cla = Conv2D(filters=self.n_boxes * self.n_classes, kernel_size=(3, 3), padding='same')(conv_5)
-        conv_5_loc = Conv2D(filters=self.n_boxes * 4, kernel_size=(3, 3), padding='same')(conv_5)
-        """
+    def make_boxes(self, batch_size, feature_height, feature_width):
+        boxes = []
+        for y in range(feature_height):
+            for x in range(feature_width):
+                for default_box in self.default_boxes:
+                    cy = y / feature_height
+                    cx = x / feature_width
+                    h = (1 + default_box[0]) / feature_height
+                    w = (1 + default_box[1]) / feature_width
+                    boxes.append([cy, cx, h, w])
+        boxes = numpy.array(boxes, copy=False, dtype=float)
+        boxes = numpy.broadcast_to(boxes, shape=(batch_size if batch_size else 0, feature_height * feature_width * self.n_boxes, 4))
+        return boxes
 
 
 class SingleShotDetector:
-    def __init__(self):
-        pass
+    def __init__(self, class_conf_threshold=0.5, jaccard_similarity_threshold=0.5):
+        self.class_conf_threshold = class_conf_threshold
+        self.jaccard_similarity_threshold = jaccard_similarity_threshold
 
     def __call__(self, base_1, base_2):
         conv_layers = MultiScaleFeatureMaps()(base_2)
         x = Predictors(n_boxes=4, n_classes=100)(base_1, base_2, *conv_layers)
         return x
-
-
-def main():
-    input = Input(shape=(512, 512, 3))
-
-    base_1, base_2 = MobileNetV2()(input)
-    output = SingleShotDetector()(base_1, base_2)
-
-    model = Model(input, output)
-    model.compile()
-    model.summary()
-
-
-if __name__ == '__main__':
-    # os.nice(2)
-    warnings.filterwarnings('ignore')
-    start_time = time.time()
-
-    main()
-
-    time_delta = relativedelta(seconds=(time.time() - start_time))
-    print('\n\nTime taken: ' +
-          (' '.join(
-              '{} {}'.format(round(getattr(time_delta, k), ndigits=2), k) for k in ['days', 'hours', 'minutes', 'seconds'] if getattr(time_delta, k))))

@@ -5,17 +5,18 @@ from dateutil.relativedelta import relativedelta
 from tensorflow.python.keras import Input
 from tensorflow.python.keras.models import Model
 
-from src.model import SingleShotDetector, MobileNetV2
+from model import SingleShotDetector, MobileNetV2
 
 
 def main():
     input = Input(shape=(512, 512, 3))
+    ssd = SingleShotDetector(image_shape=input.shape)
 
     base_1, base_2 = MobileNetV2()(input)
-    output = SingleShotDetector()(base_1, base_2)
+    output = ssd(base_1, base_2)
 
     model = Model(input, output)
-    model.compile()
+    model.compile(optimizer='adam', loss=ssd.loss_fn)
     model.summary()
 
 

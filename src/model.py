@@ -1,5 +1,8 @@
 import numpy
-from tensorflow.python.keras.layers import Conv2D, BatchNormalization, ReLU, SeparableConv2D, Add, Reshape, Softmax, Concatenate
+from tensorflow.python import Constant, Min, Max
+from tensorflow.python.keras.backend import log
+from tensorflow.python.keras.layers import Conv2D, BatchNormalization, ReLU, SeparableConv2D, Add, Reshape, Softmax, Concatenate, Average
+from tensorflow.python.keras.losses import huber_loss, categorical_crossentropy
 
 
 class BottleneckBlock:
@@ -107,22 +110,84 @@ class Predictors:
         for y in range(feature_height):
             for x in range(feature_width):
                 for default_box in self.default_boxes:
-                    cy = y / feature_height
-                    cx = x / feature_width
-                    h = (1 + default_box[0]) / feature_height
-                    w = (1 + default_box[1]) / feature_width
-                    boxes.append([cy, cx, h, w])
+                    boxes.append([feature_height, feature_width, y, x, 1 + default_box[0], 1 + default_box[1]])
         boxes = numpy.array(boxes, copy=False, dtype=float)
-        boxes = numpy.broadcast_to(boxes, shape=(batch_size if batch_size else 0, feature_height * feature_width * self.n_boxes, 4))
+        boxes = numpy.broadcast_to(boxes, shape=(batch_size if batch_size else 0, feature_height * feature_width * self.n_boxes, boxes.shape[1]))
         return boxes
 
 
 class SingleShotDetector:
-    def __init__(self, class_conf_threshold=0.5, jaccard_similarity_threshold=0.5):
-        self.class_conf_threshold = class_conf_threshold
-        self.jaccard_similarity_threshold = jaccard_similarity_threshold
+    def __init__(self, image_shape, class_conf_threshold=0.1, jaccard_similarity_threshold=0.5, mode='train', n_boxes=4, n_classes=100, loc_loss_weight=1):
+        self.class_conf_threshold = Constant(class_conf_threshold)
+        self.jaccard_similarity_threshold = Constant(jaccard_similarity_threshold)
+        self.mode = mode
+        self.n_boxes = n_boxes
+        self.n_classes = n_classes
+        self.loc_loss_weight = loc_loss_weight
+        self.image_shape = image_shape
 
     def __call__(self, base_1, base_2):
         conv_layers = MultiScaleFeatureMaps()(base_2)
-        x = Predictors(n_boxes=4, n_classes=100)(base_1, base_2, *conv_layers)
-        return x
+        predictions = Predictors(n_boxes=self.n_boxes, n_classes=self.n_classes)(base_1, base_2, *conv_layers)
+        if self.mode == 'train':
+            return predictions
+
+    def loss_fn(self, y_true, y_pred):
+        loss_vec = []
+        # separate loss calculation for all batches
+        for ground_truth_boxes, predicted_and_default_boxes in zip(y_true, y_pred):
+            batch_loss_vec = []
+            # processing each predicted box
+            for predicted_and_default_box in predicted_and_default_boxes:
+                loss = self.calculate_loss(predicted_and_default_box[:self.n_classes],
+                                           predicted_and_default_box[self.n_classes:self.n_classes + 4],
+                                           predicted_and_default_box[self.n_classes + 4:],
+                                           ground_truth_boxes[..., 1:])
+                if loss != 0:
+                    batch_loss_vec.append(loss)
+            batch_loss_vec = Add()(batch_loss_vec)[0]
+            loss_vec.append(batch_loss_vec)
+        loss = Average()(loss_vec)
+        return loss[0]
+
+    def calculate_loss(self, predicted_classes, predicted_box, default_box, ground_truth_boxes):
+        l_cy = predicted_box[0] * self.image_shape[0]
+        l_cx = predicted_box[1] * self.image_shape[1]
+        l_h = predicted_box[2] * self.image_shape[0]
+        l_w = predicted_box[3] * self.image_shape[1]
+
+        for g_box in ground_truth_boxes:
+            g_cy = g_box[0] * self.image_shape[0]
+            g_cx = g_box[1] * self.image_shape[1]
+            g_h = g_box[2] * self.image_shape[0]
+            g_w = g_box[3] * self.image_shape[1]
+
+            if self.intersection_over_union((l_cy - 0.5 * l_h, l_cy + 0.5 * l_h, l_cx - 0.5 * l_w, l_cx + 0.5 * l_w),
+                                            (g_cy - 0.5 * g_h, g_cy + 0.5 * g_h, g_cx - 0.5 * g_w, g_cx + 0.5 * g_w)) > self.jaccard_similarity_threshold:
+                default_box = Reshape(target_shape=(1, 4))(default_box)
+                y_true = Reshape(target_shape=(1, 4))(g_box)
+                y_true[..., :2] = (y_true[..., :2] - default_box[..., :2]) / default_box[..., 2:]
+                y_true[..., 2:] = log(y_true[..., 2:] / default_box[..., 2:])
+                loc_loss = Add()(huber_loss(y_true=y_true, y_pred=Reshape(target_shape=predicted_box.shape)(predicted_box)))
+
+                predicted_classes = Reshape(target_shape=(1, self.n_classes))(predicted_classes)
+                y_true = numpy.zeros(shape=predicted_classes.shape)
+                y_true[..., g_box[4]] = 1
+                classification_loss = categorical_crossentropy(y_true=y_true, y_pred=predicted_classes)
+
+                return self.loc_loss_weight * loc_loss + classification_loss
+        return 0
+
+    @staticmethod
+    def intersection_over_union(predicted_box, ground_truth_box):
+        inter_y_min = Max([predicted_box[0], ground_truth_box[0]])
+        inter_y_max = Min([predicted_box[1], ground_truth_box[1]])
+        inter_x_min = Max([predicted_box[2], ground_truth_box[2]])
+        inter_x_max = Min([predicted_box[3], ground_truth_box[3]])
+
+        union_y_min = Min([predicted_box[0], ground_truth_box[0]])
+        union_y_max = Max([predicted_box[1], ground_truth_box[1]])
+        union_x_min = Min([predicted_box[2], ground_truth_box[2]])
+        union_x_max = Max([predicted_box[3], ground_truth_box[3]])
+
+        return ((inter_y_max - inter_y_min) * (inter_x_max - inter_x_min)) / ((union_y_max - union_y_min) * (union_x_max - union_x_min))

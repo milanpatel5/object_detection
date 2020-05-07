@@ -9,14 +9,25 @@ from model import SingleShotDetector, MobileNetV2
 
 
 def main():
+    """
+    Main method for experimentation
+    :return: Nothing(0)
+    """
+    # Input tensor
     input = Input(shape=(512, 512, 3))
+
+    # Initialize SSD class object
     ssd = SingleShotDetector(image_shape=input.shape)
 
+    # Fetch features from base model and then pass them to SSD model for predictions
     base_1, base_2 = MobileNetV2()(input)
     output = ssd(base_1, base_2)
 
+    # Creation of model object based on input tensor and output tensor from SSD
     model = Model(input, output)
+    # Compile model with specified loss method
     model.compile(optimizer='adam', loss=ssd.loss_fn)
+    # Printing model summary to stdout
     model.summary()
 
 

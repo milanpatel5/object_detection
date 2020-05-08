@@ -1,8 +1,10 @@
 import numpy
-from tensorflow.python import Constant, Min, Max
-from tensorflow.python.keras.backend import log
-from tensorflow.python.keras.layers import Conv2D, BatchNormalization, ReLU, SeparableConv2D, Add, Reshape, Softmax, Concatenate, Average
-from tensorflow.python.keras.losses import huber_loss, categorical_crossentropy
+from tensorflow.python import Constant, Min, Max, where
+from tensorflow.python.framework import ops
+from tensorflow.python.keras.backend import sum, mean, log, zeros, floatx
+from tensorflow.python.keras.layers import Conv2D, BatchNormalization, ReLU, SeparableConv2D, Add, Reshape, Softmax, Concatenate
+from tensorflow.python.keras.losses import categorical_crossentropy
+from tensorflow.python.ops import math_ops
 
 
 class BottleneckBlock:
@@ -229,48 +231,73 @@ class SingleShotDetector:
     def loss_fn(self, y_true, y_pred):
         """
         Method to calculate loss during training
-        :param y_true: tensor containing the ground truth boxes
-        :param y_pred: tensor containing the default boxes and predicted boxes
+        :param y_true: tensor containing the Anchor boxes of corresponding ground truth boxes in shape(batch, total_boxes, n_classes + 5)
+        :param y_pred: tensor containing the predicted boxes and default boxes in shape(batch, total_boxes, n_classes + 8)
         :return: mean loss value
         """
-        loss_vec = []
+        # generate Anchor boxes from given ground truth boxes
+        y_true = self.encode_input(y_true, y_pred[:, :, self.n_classes + 4:])
 
-        # separate loss calculation for all batches
-        for ground_truth_boxes, predicted_and_default_boxes in zip(y_true, y_pred):
-            batch_loss_vec = []
+        # identifying matched anchor boxes
+        is_match = sum(1 - y_true[:, :, :1], axis=2)
+        n_matched_boxes = sum(is_match, axis=1)
 
-            # processing each predicted box
-            for predicted_and_default_box in predicted_and_default_boxes:
-                loss = self.calculate_loss(predicted_and_default_box[:self.n_classes],
-                                           predicted_and_default_box[self.n_classes:self.n_classes + 4],
-                                           predicted_and_default_box[self.n_classes + 4:],
-                                           ground_truth_boxes[..., 1:])
-                # loss will be non-zero in case of active default box
-                if loss != 0:
-                    batch_loss_vec.append(loss)
-            # Add losses of all the boxes in a batch
-            batch_loss_vec = Add()(batch_loss_vec)[0]
-            loss_vec.append(batch_loss_vec)
-        # Mean of loss values over all batches
-        loss = Average()(loss_vec)
-        return loss[0]
+        # calculating losses
+        classification_loss = categorical_crossentropy(y_true=y_true[:, :, 1:self.n_classes + 1], y_pred=y_pred[:, :, :self.n_classes])
+        localization_loss = Add()([huber_loss(y_true=y_true[:, :, self.n_classes + 1 + i], y_pred=y_pred[:, :, self.n_classes + i]) for i in range(4)])
 
-    def calculate_loss(self, predicted_classes, predicted_box, default_box, ground_truth_boxes):
+        # weighted total loss
+        loss = classification_loss + self.loc_loss_weight * localization_loss
+
+        # we only want to calculate losses for matched anchor boxes
+        loss = where(is_match == 0, zeros(shape=is_match.shape), loss)
+        # taking mean over matched anchor boxes
+        loss = sum(loss, axis=1)
+        loss = where(n_matched_boxes > 0, loss / n_matched_boxes, zeros(shape=n_matched_boxes.shape))
+        # taking mean over batch
+        loss = mean(loss, axis=0)
+
+        return loss
+
+    def encode_input(self, ground_truth_boxes, default_boxes):
         """
-        Method to calculate loss value for given default box and corresponding prediction
-        :param predicted_classes: Output of softmax from classification conf module
-        :param predicted_box: Predicted localization parameters
-        :param default_box: Localization parameters of default box for reference
-        :param ground_truth_boxes: All ground truth boxes
-        :return:
+        Method to generate anchor boxes based on given ground_truth boxes
+        :param ground_truth_boxes: shape=(batch_size, identified_object_count, 5)
+        :param default_boxes: shape=(batch_size, total_boxes, 4)
+        :return: anchor_boxes in shape=(batch_size, total_boxes, 1 + n_classes + 4)
         """
-        # Scaled (cy, cx, h, w) parameters of predicted box based on input image dimensions
-        l_cy = predicted_box[0] * self.image_shape[0]
-        l_cx = predicted_box[1] * self.image_shape[1]
-        l_h = predicted_box[2] * self.image_shape[0]
-        l_w = predicted_box[3] * self.image_shape[1]
+        batch_size = default_boxes.shape[0]
+        total_boxes = default_boxes.shape[1]
 
-        for g_box in ground_truth_boxes:
+        anchor_boxes = zeros(shape=(batch_size, total_boxes, 1 + self.n_classes + 4), dtype=float)
+        for image_idx in range(batch_size):
+            # processing each default_box
+            for default_box_idx, default_box in enumerate(default_boxes[image_idx]):
+                # find the overlapping ground_truth box
+                matched_box_idx = self.find_matching_box(default_box, ground_truth_boxes[image_idx])
+                if 0 <= matched_box_idx < ground_truth_boxes[image_idx].shape[0]:
+                    matched_box = ground_truth_boxes[image_idx][matched_box_idx]
+                    # assign target class
+                    anchor_boxes[image_idx, default_box_idx, matched_box[4] + 1] = 1
+                    # calculate g^ vector
+                    anchor_boxes[image_idx, default_box_idx, 1 + self.n_classes:] += matched_box[:4]
+                    anchor_boxes[image_idx, default_box_idx, 1 + self.n_classes:1 + self.n_classes + 2] -= matched_box[:2]
+                    anchor_boxes[image_idx, default_box_idx, 1 + self.n_classes:1 + self.n_classes + 2] /= matched_box[2:]
+                    anchor_boxes[image_idx, default_box_idx, 1 + self.n_classes + 2:] /= matched_box[2:]
+                    anchor_boxes[image_idx, default_box_idx, 1 + self.n_classes + 2:] = log(anchor_boxes[image_idx, default_box_idx, 1 + self.n_classes + 2:])
+                else:
+                    anchor_boxes[image_idx, default_box_idx, 0] = 1
+
+        return anchor_boxes
+
+    def find_matching_box(self, default_box, ground_truth_boxes):
+        # Scaled (cy, cx, h, w) parameters of default box based on input image dimensions
+        d_cy = default_box[0] * self.image_shape[0]
+        d_cx = default_box[1] * self.image_shape[1]
+        d_h = default_box[2] * self.image_shape[0]
+        d_w = default_box[3] * self.image_shape[1]
+
+        for idx, g_box in enumerate(ground_truth_boxes):
             # Scaled (cy, cx, h, w) parameters of ground_truth box based on input image dimensions
             g_cy = g_box[0] * self.image_shape[0]
             g_cx = g_box[1] * self.image_shape[1]
@@ -278,45 +305,57 @@ class SingleShotDetector:
             g_w = g_box[3] * self.image_shape[1]
 
             # Check whether ground_truth box and default_box match
-            if self.intersection_over_union((l_cy - 0.5 * l_h, l_cy + 0.5 * l_h, l_cx - 0.5 * l_w, l_cx + 0.5 * l_w),
+            if self.intersection_over_union((d_cy - 0.5 * d_h, d_cy + 0.5 * d_h, d_cx - 0.5 * d_w, d_cx + 0.5 * d_w),
                                             (g_cy - 0.5 * g_h, g_cy + 0.5 * g_h, g_cx - 0.5 * g_w, g_cx + 0.5 * g_w)) > self.jaccard_similarity_threshold:
-                # Reshape to add batch dimension
-                default_box = Reshape(target_shape=(1, 4))(default_box)
-
-                # Prepare G^ vector as mentioned in the paper
-                y_true = Reshape(target_shape=(1, 4))(g_box)
-                y_true[..., :2] = (y_true[..., :2] - default_box[..., :2]) / default_box[..., 2:]
-                y_true[..., 2:] = log(y_true[..., 2:] / default_box[..., 2:])
-                loc_loss = Add()(huber_loss(y_true=y_true, y_pred=Reshape(target_shape=predicted_box.shape)(predicted_box)))
-
-                # Reshape to add batch dimension
-                predicted_classes = Reshape(target_shape=(1, self.n_classes))(predicted_classes)
-                # Prepare y_true vector based on actual classification category of ground_truth box
-                y_true = numpy.zeros(shape=predicted_classes.shape)
-                y_true[..., g_box[4]] = 1
-
-                classification_loss = categorical_crossentropy(y_true=y_true, y_pred=predicted_classes)
-
-                # Calculation of weighted total loss
-                return self.loc_loss_weight * loc_loss + classification_loss
-        return 0
+                return idx
+        return -1
 
     @staticmethod
-    def intersection_over_union(predicted_box, ground_truth_box):
+    def intersection_over_union(default_box, ground_truth_box):
         """
         Method for Jaccard Similarity calculation
-        :param predicted_box:
+        :param default_box:
         :param ground_truth_box:
         :return:
         """
-        inter_y_min = Max([predicted_box[0], ground_truth_box[0]])
-        inter_y_max = Min([predicted_box[1], ground_truth_box[1]])
-        inter_x_min = Max([predicted_box[2], ground_truth_box[2]])
-        inter_x_max = Min([predicted_box[3], ground_truth_box[3]])
+        inter_y_min = Max([default_box[0], ground_truth_box[0]])
+        inter_y_max = Min([default_box[1], ground_truth_box[1]])
+        inter_x_min = Max([default_box[2], ground_truth_box[2]])
+        inter_x_max = Min([default_box[3], ground_truth_box[3]])
 
-        union_y_min = Min([predicted_box[0], ground_truth_box[0]])
-        union_y_max = Max([predicted_box[1], ground_truth_box[1]])
-        union_x_min = Min([predicted_box[2], ground_truth_box[2]])
-        union_x_max = Max([predicted_box[3], ground_truth_box[3]])
+        union_y_min = Min([default_box[0], ground_truth_box[0]])
+        union_y_max = Max([default_box[1], ground_truth_box[1]])
+        union_x_min = Min([default_box[2], ground_truth_box[2]])
+        union_x_max = Max([default_box[3], ground_truth_box[3]])
 
         return ((inter_y_max - inter_y_min) * (inter_x_max - inter_x_min)) / ((union_y_max - union_y_min) * (union_x_max - union_x_min))
+
+
+def huber_loss(y_true, y_pred, delta=1.0):
+    """Customized Huber loss method to avoid mean operation
+
+    For each value x in `error = y_true - y_pred`:
+
+    ```
+    loss = 0.5 * x^2                  if |x| <= d
+    loss = 0.5 * d^2 + d * (|x| - d)  if |x| > d
+    ```
+    where d is `delta`. See: https://en.wikipedia.org/wiki/Huber_loss
+
+    Args:
+      y_true: tensor of true targets.
+      y_pred: tensor of predicted targets.
+      delta: A float, the point where the Huber loss function changes from a
+        quadratic to linear.
+
+    Returns:
+      Tensor with one scalar loss entry per sample.
+    """
+    y_pred = math_ops.cast(y_pred, dtype=floatx())
+    y_true = math_ops.cast(y_true, dtype=floatx())
+    error = math_ops.subtract(y_pred, y_true)
+    abs_error = math_ops.abs(error)
+    quadratic = math_ops.minimum(abs_error, delta)
+    linear = math_ops.subtract(abs_error, quadratic)
+    return math_ops.add(math_ops.multiply(ops.convert_to_tensor_v2(0.5, dtype=quadratic.dtype), math_ops.multiply(quadratic, quadratic)),
+                        math_ops.multiply(delta, linear))

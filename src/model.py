@@ -307,23 +307,22 @@ class SingleShotDetector:
                 return idx
         return -1
 
-    @staticmethod
-    def intersection_over_union(default_box, ground_truth_box):
+    def intersection_over_union(self, default_box, ground_truth_box):
         """
         Method for Jaccard Similarity calculation
         :param default_box:
         :param ground_truth_box:
         :return:
         """
-        inter_y_min = max(default_box[0], ground_truth_box[0])
-        inter_y_max = min(default_box[1], ground_truth_box[1])
-        inter_x_min = max(default_box[2], ground_truth_box[2])
-        inter_x_max = min(default_box[3], ground_truth_box[3])
+        inter_y_min = max(default_box[0], ground_truth_box[0], 0)
+        inter_y_max = min(default_box[1], ground_truth_box[1], self.image_shape[0])
+        inter_x_min = max(default_box[2], ground_truth_box[2], 0)
+        inter_x_max = min(default_box[3], ground_truth_box[3], self.image_shape[1])
 
-        union_y_min = min(default_box[0], ground_truth_box[0])
-        union_y_max = max(default_box[1], ground_truth_box[1])
-        union_x_min = min(default_box[2], ground_truth_box[2])
-        union_x_max = max(default_box[3], ground_truth_box[3])
+        union_y_min = max(min(default_box[0], ground_truth_box[0]), 0)
+        union_y_max = min(max(default_box[1], ground_truth_box[1]), self.image_shape[0])
+        union_x_min = max(min(default_box[2], ground_truth_box[2]), 0)
+        union_x_max = min(max(default_box[3], ground_truth_box[3]), self.image_shape[1])
 
         return ((inter_y_max - inter_y_min) * (inter_x_max - inter_x_min)) / ((union_y_max - union_y_min) * (union_x_max - union_x_min))
 

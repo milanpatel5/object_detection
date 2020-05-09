@@ -1,7 +1,9 @@
 import time
 import warnings
 
+import numpy
 from dateutil.relativedelta import relativedelta
+from numpy.random import rand
 from tensorflow.python.keras import Input
 from tensorflow.python.keras.models import Model
 
@@ -14,10 +16,11 @@ def main():
     :return: Nothing(0)
     """
     # Input tensor
-    input = Input(shape=(512, 512, 3))
+    image_shape = (512, 512, 3)
+    input = Input(shape=image_shape)
 
     # Initialize SSD class object
-    ssd = SingleShotDetector(image_shape=input.shape)
+    ssd = SingleShotDetector(image_shape=image_shape)
 
     # Fetch features from base model and then pass them to SSD model for predictions
     base_1, base_2 = MobileNetV2()(input)
@@ -29,6 +32,14 @@ def main():
     model.compile(optimizer='adam', loss=ssd.loss_fn)
     # Printing model summary to stdout
     model.summary()
+
+    # sample training
+    x = rand(10, 512, 512, 3)
+    y = rand(10, 4, 5)
+    y[:, :, 4] = [x for x in range(y.shape[1])]
+    y = numpy.array([ssd.encode_input(g_box) for g_box in y], copy=False, dtype='float32')
+
+    model.fit(x=x, y=y, batch_size=4)
 
 
 if __name__ == '__main__':

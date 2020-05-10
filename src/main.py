@@ -6,6 +6,7 @@ from dateutil.relativedelta import relativedelta
 from numpy.random import rand
 from tensorflow.python.keras import Input
 from tensorflow.python.keras.models import Model
+from tensorflow.python.keras.utils.vis_utils import plot_model
 
 from model import SingleShotDetector, MobileNetV2
 
@@ -32,6 +33,7 @@ def main():
     model.compile(optimizer='adam', loss=ssd.loss_fn)
     # Printing model summary to stdout
     model.summary()
+    plot_model(model=model, show_shapes=True, expand_nested=True, dpi=96, to_file='model.png')
 
     # sample training
     x = rand(10, 512, 512, 3)
@@ -39,7 +41,7 @@ def main():
     y[:, :, 4] = [x for x in range(y.shape[1])]
     y = numpy.array([ssd.encode_input(g_box) for g_box in y], copy=False, dtype='float32')
 
-    model.fit(x=x, y=y, batch_size=4)
+    model.fit(x=x, y=y, batch_size=4, epochs=1)
 
 
 if __name__ == '__main__':

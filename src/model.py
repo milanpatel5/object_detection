@@ -265,7 +265,7 @@ class SingleShotDetector:
         """
         Method to generate anchor boxes based on given ground_truth boxes
         :param ground_truth_boxes: shape=(identified_object_count, 5)
-        :return: anchor_boxes in shape=(batch_size, total_boxes, 1 + n_classes + 4)
+        :return: anchor_boxes in shape=(total_boxes, 1 + n_classes + 4)
         """
         anchor_boxes = numpy.zeros(shape=(self.default_boxes.shape[1], 1 + self.n_classes + 4), dtype='float32')
         # processing each default_box

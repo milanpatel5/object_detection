@@ -253,7 +253,7 @@ class SingleShotDetector:
         # taking mean over matched anchor boxes
         loss = sum(loss, axis=1)
         loss = Multiply()([loss, n_matched_boxes])
-        n_matched_boxes += 1
+        n_matched_boxes += 1e-7
         n_matched_boxes = Multiply()([n_matched_boxes, n_matched_boxes])
         loss = loss / n_matched_boxes
 

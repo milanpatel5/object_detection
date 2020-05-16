@@ -71,7 +71,7 @@ class InvertedResidualBlock:
 
         # remaining repetitions with residual operation and with stride=1
         for _ in range(self.n - 1):
-            x = BottleneckBlock(self.t, self.c, 1, True)(x)
+            x = BottleneckBlock(self.t, self.c, 1, residual=True)(x)
         return x
 
 
@@ -278,9 +278,9 @@ class SingleShotDetector:
                 anchor_boxes[default_box_idx, int(matched_box[4]) + 1] = 1
                 # calculate g^ vector
                 anchor_boxes[default_box_idx, 1 + self.n_classes:] += matched_box[:4]
-                anchor_boxes[default_box_idx, 1 + self.n_classes:1 + self.n_classes + 2] -= matched_box[:2]
-                anchor_boxes[default_box_idx, 1 + self.n_classes:1 + self.n_classes + 2] /= matched_box[2:4]
-                anchor_boxes[default_box_idx, 1 + self.n_classes + 2:] /= matched_box[2:4]
+                anchor_boxes[default_box_idx, 1 + self.n_classes:1 + self.n_classes + 2] -= default_box[:2]
+                anchor_boxes[default_box_idx, 1 + self.n_classes:1 + self.n_classes + 2] /= default_box[2:4]
+                anchor_boxes[default_box_idx, 1 + self.n_classes + 2:] /= default_box[2:4]
                 anchor_boxes[default_box_idx, 1 + self.n_classes + 2:] = log(anchor_boxes[default_box_idx, 1 + self.n_classes + 2:])
             else:
                 anchor_boxes[default_box_idx, 0] = 1

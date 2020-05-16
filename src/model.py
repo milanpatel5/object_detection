@@ -233,7 +233,7 @@ class SingleShotDetector:
         """
         Method to calculate loss during training
         :param y_true: tensor containing the Anchor boxes of corresponding ground truth boxes in shape(batch, total_boxes, n_classes + 5)
-        :param y_pred: tensor containing the predicted boxes and default boxes in shape(batch, total_boxes, n_classes + 8)
+        :param y_pred: tensor containing the predicted boxes and default boxes in shape(batch, total_boxes, n_classes + 4)
         :return: mean loss value
         """
         # identifying matched anchor boxes
@@ -242,19 +242,19 @@ class SingleShotDetector:
 
         # calculating losses
         classification_loss = categorical_crossentropy(y_true=y_true[:, :, 1:self.n_classes + 1], y_pred=y_pred[:, :, :self.n_classes])
-        localization_loss = Add()([huber_loss(y_true=y_true[:, :, self.n_classes + 1 + i], y_pred=y_pred[:, :, self.n_classes + i]) for i in range(4)])
+        localization_loss = Add()([smooth_l1_loss(y_true=y_true[:, :, self.n_classes + 1 + i], y_pred=y_pred[:, :, self.n_classes + i]) for i in range(4)])
+
+        # we only want to calculate losses for matched anchor boxes
+        localization_loss = Multiply()([is_match, localization_loss])
 
         # weighted total loss
         loss = classification_loss + self.loc_loss_weight * localization_loss
 
-        # we only want to calculate losses for matched anchor boxes
-        loss = Multiply()([loss, is_match])
-
         # taking mean over matched anchor boxes
         loss = sum(loss, axis=1)
         loss = Multiply()([loss, n_matched_boxes])
-        n_matched_boxes += 1e-7
         n_matched_boxes = Multiply()([n_matched_boxes, n_matched_boxes])
+        n_matched_boxes += 1e-7
         loss = loss / n_matched_boxes
 
         # taking mean over batch
@@ -327,7 +327,7 @@ class SingleShotDetector:
         return ((inter_y_max - inter_y_min) * (inter_x_max - inter_x_min)) / ((union_y_max - union_y_min) * (union_x_max - union_x_min))
 
 
-def huber_loss(y_true, y_pred, delta=1.0):
+def smooth_l1_loss(y_true, y_pred, delta=1.0):
     """Customized Huber loss method to avoid mean operation
 
     For each value x in `error = y_true - y_pred`:

@@ -1,0 +1,4 @@
+dateutil
+cv2
+tensorflow
+numpy

@@ -1,12 +1,15 @@
+import json
+import os
 import time
 import warnings
+from math import ceil
 
+import cv2
 import numpy
 from dateutil.relativedelta import relativedelta
-from numpy.random import rand
 from tensorflow.python.keras import Input
 from tensorflow.python.keras.models import Model
-from tensorflow.python.keras.utils.vis_utils import plot_model
+from tensorflow.python.keras.utils.data_utils import Sequence
 
 from model import SingleShotDetector, MobileNetV2
 
@@ -21,7 +24,7 @@ def main():
     input = Input(shape=image_shape)
 
     # Initialize SSD class object
-    ssd = SingleShotDetector(image_shape=image_shape)
+    ssd = SingleShotDetector(image_shape=image_shape, n_classes=10)
 
     # Fetch features from base model and then pass them to SSD model for predictions
     base_1, base_2 = MobileNetV2()(input)
@@ -32,20 +35,45 @@ def main():
     # Compile model with specified loss method
     model.compile(optimizer='adam', loss=ssd.loss_fn)
     # Printing model summary to stdout
-    model.summary()
-    plot_model(model=model, show_shapes=True, expand_nested=True, dpi=96, to_file='model.png')
+    # model.summary()
+    # plot_model(model=model, show_shapes=True, expand_nested=True, dpi=96, to_file='model.png')
 
     # sample training
-    x = rand(10, 512, 512, 3)
-    y = rand(10, 4, 5)
-    y[:, :, 4] = [x for x in range(y.shape[1])]
-    y = numpy.array([ssd.encode_input(g_box) for g_box in y], copy=False, dtype='float32')
+    model.fit(x=DataLoader(ssd, batch_size=4), epochs=10)
 
-    model.fit(x=x, y=y, batch_size=4, epochs=1)
+
+class DataLoader(Sequence):
+    def __init__(self, model, batch_size=4):
+        self.model = model
+        self.batch_size = batch_size
+        self.image_shape = self.model.image_shape
+        with open('datasets/train/annotations.json') as data_file:
+            self.train_dataset = json.load(data_file)
+
+    def __getitem__(self, index):
+        x = []
+        y = []
+        for train_data in self.train_dataset[index * self.batch_size: (index + 1) * self.batch_size]:
+            image_path = train_data['path']
+            ground_truth_boxes = []
+            for obj in train_data['annotations']:
+                loc = obj['coordinates']
+                label = obj['label']
+                cy = loc['y'] / self.image_shape[0]
+                cx = loc['x'] / self.image_shape[1]
+                h = loc['height'] / self.image_shape[0]
+                w = loc['width'] / self.image_shape[1]
+                ground_truth_boxes.append([cy, cx, h, w, int(label)])
+            x.append(cv2.imread(image_path))
+            y.append(self.model.encode_input(numpy.array(ground_truth_boxes)))
+        return numpy.array(x), numpy.array(y)
+
+    def __len__(self):
+        return ceil(len(self.train_dataset) / self.batch_size)
 
 
 if __name__ == '__main__':
-    # os.nice(2)
+    os.nice(2)
     warnings.filterwarnings('ignore')
     start_time = time.time()
 

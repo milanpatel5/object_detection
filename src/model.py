@@ -1,6 +1,7 @@
 import numpy
+from tensorflow import int64
 from tensorflow.python.framework import ops
-from tensorflow.python.keras.backend import sum, mean, log, floatx, cast, equal, argmax
+from tensorflow.python.keras.backend import sum, mean, log, floatx, cast, equal, argmax, any
 from tensorflow.python.keras.layers import Conv2D, BatchNormalization, ReLU, SeparableConv2D, Add, Reshape, Softmax, Concatenate, Multiply
 from tensorflow.python.keras.losses import categorical_crossentropy
 from tensorflow.python.ops import math_ops
@@ -242,7 +243,11 @@ class SingleShotDetector:
         n_matched_boxes = sum(is_match, axis=1)
 
         # calculating accuracy
-        self.accuracy = cast(equal(argmax(y_true[:, :, 1:self.n_classes + 1]), argmax(y_pred[:, :, :self.n_classes])), floatx())
+        true_idx = argmax(y_true[:, :, :self.n_classes + 1])
+        pred_idx = cast(any(y_pred[:, :, :self.n_classes] > self.class_conf_threshold, axis=-1), int64)
+        pred_idx = pred_idx * (argmax(y_pred[:, :, :self.n_classes]) + 1)
+        self.accuracy = cast(equal(true_idx, pred_idx), floatx())
+        del true_idx, pred_idx
 
         # calculating losses
         classification_loss = categorical_crossentropy(y_true=y_true[:, :, 1:self.n_classes + 1], y_pred=y_pred[:, :, :self.n_classes])

@@ -3,12 +3,15 @@ import os
 import time
 import warnings
 from math import ceil
+from random import shuffle
 
 import cv2
 import numpy
 from dateutil.relativedelta import relativedelta
 from tensorflow.python.keras import Input
+from tensorflow.python.keras.callbacks import ModelCheckpoint
 from tensorflow.python.keras.models import Model
+from tensorflow.python.keras.optimizer_v2.adam import Adam
 from tensorflow.python.keras.utils.data_utils import Sequence
 
 from model import SingleShotDetector, MobileNetV2
@@ -33,13 +36,13 @@ def main():
     # Creation of model object based on input tensor and output tensor from SSD
     model = Model(input, output)
     # Compile model with specified loss method
-    model.compile(optimizer='adam', loss=ssd.loss_fn)
+    model.compile(optimizer=Adam(), loss=ssd.loss_fn, metrics=[ssd.accuracy_fn])
     # Printing model summary to stdout
     # model.summary()
     # plot_model(model=model, show_shapes=True, expand_nested=True, dpi=96, to_file='model.png')
 
     # sample training
-    model.fit(x=DataLoader(ssd, batch_size=4), epochs=10)
+    model.fit(x=DataLoader(ssd, batch_size=8), epochs=10, callbacks=[ModelCheckpoint(filepath='saved_model.h5', monitor='accuracy_fn', save_best_only=True, verbose=1)])
 
 
 class DataLoader(Sequence):
@@ -49,6 +52,7 @@ class DataLoader(Sequence):
         self.image_shape = self.model.image_shape
         with open('datasets/train/annotations.json') as data_file:
             self.train_dataset = json.load(data_file)
+            shuffle(self.train_dataset)
 
     def __getitem__(self, index):
         x = []

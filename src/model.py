@@ -1,6 +1,6 @@
 import numpy
 from tensorflow.python.framework import ops
-from tensorflow.python.keras.backend import sum, mean, log, floatx
+from tensorflow.python.keras.backend import sum, mean, log, floatx, cast, equal, argmax
 from tensorflow.python.keras.layers import Conv2D, BatchNormalization, ReLU, SeparableConv2D, Add, Reshape, Softmax, Concatenate, Multiply
 from tensorflow.python.keras.losses import categorical_crossentropy
 from tensorflow.python.ops import math_ops
@@ -187,6 +187,7 @@ class SingleShotDetector:
         # Fixed set of default boxes with different scales and aspect ratios (Other random generation method can be used)
         self.default_box_scales = [(0, 0), (0, 1), (1, 0), (1, 1), (2, 0), (0, 2), (1, 2), (2, 1), (2, 2)][:n_boxes]
         self.default_boxes = None
+        self.accuracy = None
 
     def __call__(self, base_1, base_2):
         # Extract features of varying scales from input of base model
@@ -240,6 +241,9 @@ class SingleShotDetector:
         is_match = sum(1 - y_true[:, :, :1], axis=2)
         n_matched_boxes = sum(is_match, axis=1)
 
+        # calculating accuracy
+        self.accuracy = cast(equal(argmax(y_true[:, :, 1:self.n_classes + 1]), argmax(y_pred[:, :, :self.n_classes])), floatx())
+
         # calculating losses
         classification_loss = categorical_crossentropy(y_true=y_true[:, :, 1:self.n_classes + 1], y_pred=y_pred[:, :, :self.n_classes])
         localization_loss = Add()([smooth_l1_loss(y_true=y_true[:, :, self.n_classes + 1 + i], y_pred=y_pred[:, :, self.n_classes + i]) for i in range(4)])
@@ -260,6 +264,9 @@ class SingleShotDetector:
         # taking mean over batch
         loss = mean(loss, axis=0)
         return loss
+
+    def accuracy_fn(self, y_true, y_pred):
+        return self.accuracy
 
     def encode_input(self, ground_truth_boxes):
         """

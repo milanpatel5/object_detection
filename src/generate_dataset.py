@@ -18,10 +18,10 @@ parser = argparse.ArgumentParser(description='Create synthetic training data for
 parser.add_argument("-bkg", "--backgrounds", type=str, default="datasets/raw/background/", help="Path to background images folder.")
 parser.add_argument("-obj", "--objects", type=str, default="datasets/raw/objects/", help="Path to object images folder.")
 parser.add_argument("-o", "--output", type=str, default="datasets/train/", help="Path to output images folder.")
-parser.add_argument("-ann", "--annotate", type=bool, default=False, help="Include annotations in the data augmentation steps?")
+parser.add_argument("-ann", "--annotate", type=bool, default=True, help="Include annotations in the data augmentation steps?")
 parser.add_argument("-s", "--sframe", type=bool, default=False, help="Convert dataset to an sframe?")
-parser.add_argument("-g", "--groups", type=bool, default=False, help="Include groups of objects in training set?")
-parser.add_argument("-mut", "--mutate", type=bool, default=False, help="Perform mutations to objects (rotation, brightness, sharpness, contrast)")
+parser.add_argument("-g", "--groups", type=bool, default=True, help="Include groups of objects in training set?")
+parser.add_argument("-mut", "--mutate", type=bool, default=True, help="Perform mutations to objects (rotation, brightness, sharpness, contrast)")
 args = parser.parse_args()
 
 # Prepare data creation pipeline

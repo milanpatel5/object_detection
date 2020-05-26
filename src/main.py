@@ -42,7 +42,9 @@ def main():
     # plot_model(model=model, show_shapes=True, expand_nested=True, dpi=96, to_file='model.png')
 
     # sample training
-    model.fit(x=DataLoader(ssd, batch_size=8), epochs=10, callbacks=[ModelCheckpoint(filepath='saved_model.h5', monitor='accuracy_fn', save_best_only=True, verbose=1)])
+    model.load_weights('saved_model.h5')
+    model.fit(x=DataLoader(ssd, batch_size=8), epochs=500, initial_epoch=0,
+              callbacks=[ModelCheckpoint(filepath='saved_model.h5', monitor='accuracy_fn', save_best_only=True, save_weights_only=True, verbose=1)])
 
 
 class DataLoader(Sequence):
@@ -55,6 +57,8 @@ class DataLoader(Sequence):
             shuffle(self.train_dataset)
 
     def __getitem__(self, index):
+        if index == 0:
+            shuffle(self.train_dataset)
         x = []
         y = []
         for train_data in self.train_dataset[index * self.batch_size: (index + 1) * self.batch_size]:

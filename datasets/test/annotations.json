@@ -1,0 +1,498 @@
+[
+  {
+    "path": "datasets/test/1.png",
+    "annotations": [
+      {
+        "coordinates": {
+          "height": 28,
+          "width": 28,
+          "x": 389.0,
+          "y": 204.0
+        },
+        "label": "0"
+      }
+    ]
+  },
+  {
+    "path": "datasets/test/2.png",
+    "annotations": [
+      {
+        "coordinates": {
+          "height": 28,
+          "width": 84,
+          "x": 88.0,
+          "y": 153.0
+        },
+        "label": "1"
+      }
+    ]
+  },
+  {
+    "path": "datasets/test/3.png",
+    "annotations": [
+      {
+        "coordinates": {
+          "height": 28,
+          "width": 112,
+          "x": 442.0,
+          "y": 360.0
+        },
+        "label": "2"
+      }
+    ]
+  },
+  {
+    "path": "datasets/test/4.png",
+    "annotations": [
+      {
+        "coordinates": {
+          "height": 56,
+          "width": 56,
+          "x": 309.0,
+          "y": 460.0
+        },
+        "label": "3"
+      }
+    ]
+  },
+  {
+    "path": "datasets/test/5.png",
+    "annotations": [
+      {
+        "coordinates": {
+          "height": 28,
+          "width": 56,
+          "x": 103.0,
+          "y": 450.0
+        },
+        "label": "4"
+      }
+    ]
+  },
+  {
+    "path": "datasets/test/6.png",
+    "annotations": [
+      {
+        "coordinates": {
+          "height": 84,
+          "width": 56,
+          "x": 352.0,
+          "y": 221.0
+        },
+        "label": "5"
+      }
+    ]
+  },
+  {
+    "path": "datasets/test/7.png",
+    "annotations": [
+      {
+        "coordinates": {
+          "height": 84,
+          "width": 56,
+          "x": 256.0,
+          "y": 230.0
+        },
+        "label": "6"
+      }
+    ]
+  },
+  {
+    "path": "datasets/test/8.png",
+    "annotations": [
+      {
+        "coordinates": {
+          "height": 56,
+          "width": 84,
+          "x": 260.0,
+          "y": 113.0
+        },
+        "label": "7"
+      }
+    ]
+  },
+  {
+    "path": "datasets/test/9.png",
+    "annotations": [
+      {
+        "coordinates": {
+          "height": 28,
+          "width": 56,
+          "x": 245.0,
+          "y": 477.0
+        },
+        "label": "8"
+      }
+    ]
+  },
+  {
+    "path": "datasets/test/10.png",
+    "annotations": [
+      {
+        "coordinates": {
+          "height": 112,
+          "width": 28,
+          "x": 120.0,
+          "y": 235.0
+        },
+        "label": "9"
+      }
+    ]
+  },
+  {
+    "path": "datasets/test/11.png",
+    "annotations": [
+      {
+        "coordinates": {
+          "height": 28,
+          "width": 112,
+          "x": 273,
+          "y": 497
+        },
+        "label": "5"
+      },
+      {
+        "coordinates": {
+          "height": 56,
+          "width": 112,
+          "x": 446,
+          "y": 284
+        },
+        "label": "6"
+      },
+      {
+        "coordinates": {
+          "height": 112,
+          "width": 28,
+          "x": 434,
+          "y": 396
+        },
+        "label": "2"
+      },
+      {
+        "coordinates": {
+          "height": 56,
+          "width": 56,
+          "x": 226,
+          "y": 48
+        },
+        "label": "1"
+      }
+    ]
+  },
+  {
+    "path": "datasets/test/12.png",
+    "annotations": [
+      {
+        "coordinates": {
+          "height": 112,
+          "width": 112,
+          "x": 85,
+          "y": 256
+        },
+        "label": "2"
+      },
+      {
+        "coordinates": {
+          "height": 112,
+          "width": 56,
+          "x": 154,
+          "y": 127
+        },
+        "label": "7"
+      },
+      {
+        "coordinates": {
+          "height": 112,
+          "width": 84,
+          "x": 355,
+          "y": 349
+        },
+        "label": "6"
+      }
+    ]
+  },
+  {
+    "path": "datasets/test/13.png",
+    "annotations": [
+      {
+        "coordinates": {
+          "height": 84,
+          "width": 84,
+          "x": 274,
+          "y": 58
+        },
+        "label": "7"
+      },
+      {
+        "coordinates": {
+          "height": 112,
+          "width": 84,
+          "x": 421,
+          "y": 427
+        },
+        "label": "5"
+      }
+    ]
+  },
+  {
+    "path": "datasets/test/14.png",
+    "annotations": [
+      {
+        "coordinates": {
+          "height": 56,
+          "width": 84,
+          "x": 461,
+          "y": 213
+        },
+        "label": "8"
+      },
+      {
+        "coordinates": {
+          "height": 28,
+          "width": 56,
+          "x": 249,
+          "y": 463
+        },
+        "label": "5"
+      },
+      {
+        "coordinates": {
+          "height": 56,
+          "width": 56,
+          "x": 177,
+          "y": 372
+        },
+        "label": "0"
+      }
+    ]
+  },
+  {
+    "path": "datasets/test/15.png",
+    "annotations": [
+      {
+        "coordinates": {
+          "height": 28,
+          "width": 28,
+          "x": 296,
+          "y": 368
+        },
+        "label": "3"
+      },
+      {
+        "coordinates": {
+          "height": 84,
+          "width": 56,
+          "x": 384,
+          "y": 371
+        },
+        "label": "7"
+      },
+      {
+        "coordinates": {
+          "height": 28,
+          "width": 28,
+          "x": 452,
+          "y": 39
+        },
+        "label": "4"
+      }
+    ]
+  },
+  {
+    "path": "datasets/test/16.png",
+    "annotations": [
+      {
+        "coordinates": {
+          "height": 28,
+          "width": 56,
+          "x": 36,
+          "y": 15
+        },
+        "label": "3"
+      },
+      {
+        "coordinates": {
+          "height": 112,
+          "width": 84,
+          "x": 359,
+          "y": 412
+        },
+        "label": "0"
+      },
+      {
+        "coordinates": {
+          "height": 84,
+          "width": 112,
+          "x": 380,
+          "y": 100
+        },
+        "label": "3"
+      },
+      {
+        "coordinates": {
+          "height": 112,
+          "width": 84,
+          "x": 239,
+          "y": 75
+        },
+        "label": "8"
+      }
+    ]
+  },
+  {
+    "path": "datasets/test/17.png",
+    "annotations": [
+      {
+        "coordinates": {
+          "height": 28,
+          "width": 84,
+          "x": 211,
+          "y": 246
+        },
+        "label": "5"
+      },
+      {
+        "coordinates": {
+          "height": 84,
+          "width": 84,
+          "x": 184,
+          "y": 447
+        },
+        "label": "0"
+      },
+      {
+        "coordinates": {
+          "height": 112,
+          "width": 56,
+          "x": 349,
+          "y": 153
+        },
+        "label": "5"
+      },
+      {
+        "coordinates": {
+          "height": 56,
+          "width": 84,
+          "x": 399,
+          "y": 61
+        },
+        "label": "0"
+      }
+    ]
+  },
+  {
+    "path": "datasets/test/18.png",
+    "annotations": [
+      {
+        "coordinates": {
+          "height": 56,
+          "width": 56,
+          "x": 373,
+          "y": 324
+        },
+        "label": "8"
+      },
+      {
+        "coordinates": {
+          "height": 84,
+          "width": 56,
+          "x": 126,
+          "y": 153
+        },
+        "label": "5"
+      },
+      {
+        "coordinates": {
+          "height": 112,
+          "width": 112,
+          "x": 214,
+          "y": 156
+        },
+        "label": "6"
+      }
+    ]
+  },
+  {
+    "path": "datasets/test/19.png",
+    "annotations": [
+      {
+        "coordinates": {
+          "height": 28,
+          "width": 112,
+          "x": 412,
+          "y": 15
+        },
+        "label": "8"
+      },
+      {
+        "coordinates": {
+          "height": 28,
+          "width": 28,
+          "x": 246,
+          "y": 430
+        },
+        "label": "2"
+      },
+      {
+        "coordinates": {
+          "height": 56,
+          "width": 28,
+          "x": 304,
+          "y": 313
+        },
+        "label": "7"
+      },
+      {
+        "coordinates": {
+          "height": 112,
+          "width": 28,
+          "x": 240,
+          "y": 285
+        },
+        "label": "0"
+      }
+    ]
+  },
+  {
+    "path": "datasets/test/20.png",
+    "annotations": [
+      {
+        "coordinates": {
+          "height": 84,
+          "width": 28,
+          "x": 33,
+          "y": 124
+        },
+        "label": "2"
+      },
+      {
+        "coordinates": {
+          "height": 56,
+          "width": 112,
+          "x": 361,
+          "y": 424
+        },
+        "label": "6"
+      },
+      {
+        "coordinates": {
+          "height": 84,
+          "width": 112,
+          "x": 438,
+          "y": 112
+        },
+        "label": "6"
+      },
+      {
+        "coordinates": {
+          "height": 84,
+          "width": 112,
+          "x": 208,
+          "y": 430
+        },
+        "label": "8"
+      }
+    ]
+  }
+]

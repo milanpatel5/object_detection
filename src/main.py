@@ -9,6 +9,7 @@ import cv2
 import numpy
 from dateutil.relativedelta import relativedelta
 from tensorflow.python.keras import Input
+from tensorflow.python.keras.callbacks import ModelCheckpoint
 from tensorflow.python.keras.models import Model
 from tensorflow.python.keras.optimizer_v2.adam import Adam
 from tensorflow.python.keras.utils.data_utils import Sequence
@@ -26,7 +27,7 @@ def main():
     input = Input(shape=image_shape)
 
     # Initialize SSD class object
-    ssd = SingleShotDetector(image_shape=image_shape, n_classes=10)
+    ssd = SingleShotDetector(image_shape=image_shape, n_classes=10, loc_loss_weight=0.5)
 
     # Fetch features from base model and then pass them to SSD model for predictions
     base_1, base_2 = MobileNetV2()(input)
@@ -42,13 +43,14 @@ def main():
 
     # sample training
     model.load_weights('saved_model.h5')
-    # model.fit(x=DataLoader(ssd, batch_size=8, file='datasets/train/annotations.json'), epochs=500, initial_epoch=0,
-    #           callbacks=[ModelCheckpoint(filepath='saved_model.h5', monitor='accuracy_fn', save_best_only=True, save_weights_only=True, verbose=1)])
+    model.fit(x=DataLoader(ssd, batch_size=4, file='datasets/train/annotations.json'), epochs=200, initial_epoch=9,
+              callbacks=[ModelCheckpoint(filepath='saved_model.h5', monitor='accuracy_fn', save_best_only=False, save_weights_only=True, verbose=1)])
 
-    for idx, (image, _) in enumerate(DataLoader(ssd, batch_size=1, file='datasets/test/annotations.json', shuffle=False)):
-        predictions = model.predict(x=image)
-        classes, scores, boxes = ssd.decode_output(predictions[0])
-        ssd.plot_boxes(image[0], classes=classes, scores=scores, boxes=boxes, file_name='output/' + str(idx) + '.png', visualize=False)
+    # model.load_weights('saved_model.h5')
+    # for idx, (image, _) in enumerate(DataLoader(ssd, batch_size=1, file='datasets/test/annotations.json', shuffle=False)):
+    #     predictions = model.predict(x=image)
+    #     classes, scores, boxes = ssd.decode_output(predictions[0])
+    #     ssd.plot_boxes(image[0], classes=classes, scores=scores, boxes=boxes, file_name='output/' + str(idx) + '.png', visualize=False)
 
 
 class DataLoader(Sequence):

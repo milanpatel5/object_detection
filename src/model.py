@@ -1,4 +1,7 @@
+from random import random
+
 import numpy
+from matplotlib import pyplot
 from tensorflow import int64
 from tensorflow.python.framework import ops
 from tensorflow.python.keras.backend import sum, mean, log, floatx, cast, equal, argmax, any
@@ -166,20 +169,18 @@ class Predictors:
 
 
 class SingleShotDetector:
-    def __init__(self, image_shape, class_conf_threshold=0.1, jaccard_similarity_threshold=0.5, mode='train', n_boxes=4, n_classes=100, loc_loss_weight=1):
+    def __init__(self, image_shape, class_conf_threshold=0.1, jaccard_similarity_threshold=0.5, n_boxes=4, n_classes=100, loc_loss_weight=1):
         """
         SingleShotDetector model class
         :param image_shape: a tuple of image shape
         :param class_conf_threshold: Threshold value for classification confidence
         :param jaccard_similarity_threshold: Threshold value for jaccard similarity(Intersection Over Union)
-        :param mode: Mention whether it is 'train' or 'valid' mode
         :param n_boxes: Number of default boxes per position of feature map
         :param n_classes: Number of classes
         :param loc_loss_weight: Weight(alpha) of localization loss
         """
         self.class_conf_threshold = class_conf_threshold
         self.jaccard_similarity_threshold = jaccard_similarity_threshold
-        self.mode = mode
         self.n_boxes = n_boxes
         self.n_classes = n_classes
         self.loc_loss_weight = loc_loss_weight
@@ -205,12 +206,7 @@ class SingleShotDetector:
                 self.default_boxes.append(self.make_boxes(feature.shape[1], feature.shape[2]))
             self.default_boxes = numpy.concatenate(self.default_boxes, axis=1)
 
-        if self.mode == 'train':
-            # if it's training mode then return predictions as they are
-            return predictions
-        elif self.mode == 'valid':
-            # In case of validation decode the predictions and apply Non-Maximum Suppression
-            pass
+        return predictions
 
     def make_boxes(self, feature_height, feature_width):
         """
@@ -272,6 +268,37 @@ class SingleShotDetector:
 
     def accuracy_fn(self, y_true, y_pred):
         return self.accuracy
+
+    def decode_output(self, predictions):
+        cy = (predictions[:, self.n_classes:self.n_classes + 1] * self.default_boxes[0][:, 2:3] + self.default_boxes[0][:, 0:1]) * self.image_shape[0]
+        cx = (predictions[:, self.n_classes + 1:self.n_classes + 2] * self.default_boxes[0][:, 3:4] + self.default_boxes[0][:, 1:2]) * self.image_shape[1]
+        h = numpy.exp(predictions[:, self.n_classes + 2:self.n_classes + 3]) * self.default_boxes[0][:, 2:3] * self.image_shape[0]
+        w = numpy.exp(predictions[:, self.n_classes + 3:self.n_classes + 4]) * self.default_boxes[0][:, 3:4] * self.image_shape[1]
+        predictions[:, self.n_classes:self.n_classes + 1] = cy - h / 2
+        predictions[:, self.n_classes + 1:self.n_classes + 2] = cy + h / 2
+        predictions[:, self.n_classes + 2:self.n_classes + 3] = cx - w / 2
+        predictions[:, self.n_classes + 3:self.n_classes + 4] = cx + w / 2
+
+        predictions = predictions[numpy.any(predictions[:, :self.n_classes] > self.class_conf_threshold, axis=1)]
+        predictions = predictions[numpy.argsort(numpy.amax(predictions[:, :self.n_classes], axis=1), axis=0)][::-1][:self.n_classes * 10]
+        classes, scores, boxes = [], [], []
+        prev_predictions = {}
+        for prediction in predictions:
+            if numpy.any(prediction[self.n_classes:] < 0):
+                continue
+            predicted_class = numpy.argmax(prediction[:self.n_classes])
+            if predicted_class in prev_predictions.keys():
+                if self.intersection_over_union(prev_predictions[predicted_class], prediction[self.n_classes:]) > self.jaccard_similarity_threshold:
+                    classes.append(predicted_class)
+                    scores.append(prediction[predicted_class])
+                    boxes.append(prediction[self.n_classes:])
+                    prev_predictions[predicted_class] = prediction[self.n_classes:]
+            else:
+                classes.append(predicted_class)
+                scores.append(prediction[predicted_class])
+                boxes.append(prediction[self.n_classes:])
+                prev_predictions[predicted_class] = prediction[self.n_classes:]
+        return numpy.array(classes), numpy.array(scores), numpy.array(boxes)
 
     def encode_input(self, ground_truth_boxes):
         """
@@ -337,6 +364,32 @@ class SingleShotDetector:
         union_x_max = min(max(default_box[3], ground_truth_box[3]), self.image_shape[1])
 
         return ((inter_y_max - inter_y_min) * (inter_x_max - inter_x_min)) / ((union_y_max - union_y_min) * (union_x_max - union_x_min))
+
+    def plot_boxes(self, img, classes, scores, boxes, file_name, line_width=1.5, visualize=False):
+        """
+        Visualize bounding boxes. Largely inspired by SSD-MXNET!
+        """
+        img_ax = pyplot.imshow(img)
+        colors = dict()
+        for i in range(classes.shape[0]):
+            cls_id = int(classes[i])
+            if cls_id >= 0:
+                score = scores[i]
+                if cls_id not in colors:
+                    colors[cls_id] = (random(), random(), random())
+                ymin = int(boxes[i, 0])
+                xmin = int(boxes[i, 1])
+                ymax = int(boxes[i, 2])
+                xmax = int(boxes[i, 3])
+                rect = pyplot.Rectangle((xmin, ymin), xmax - xmin, ymax - ymin, fill=False, edgecolor=colors[cls_id], linewidth=line_width)
+                pyplot.gca().add_patch(rect)
+                class_name = str(cls_id)
+                pyplot.gca().text(xmin, ymin - 2, '{:s} | {:.3f}'.format(class_name, score),
+                                  bbox=dict(facecolor=colors[cls_id], alpha=0.5), fontsize=12, color='white')
+        img_ax.figure.savefig(file_name, dpi=500)
+        if visualize:
+            pyplot.show()
+        pyplot.close()
 
 
 def smooth_l1_loss(y_true, y_pred, delta=1.0):

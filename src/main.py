@@ -1,15 +1,14 @@
 import json
 import os
+import random
 import time
 import warnings
 from math import ceil
-from random import shuffle
 
 import cv2
 import numpy
 from dateutil.relativedelta import relativedelta
 from tensorflow.python.keras import Input
-from tensorflow.python.keras.callbacks import ModelCheckpoint
 from tensorflow.python.keras.models import Model
 from tensorflow.python.keras.optimizer_v2.adam import Adam
 from tensorflow.python.keras.utils.data_utils import Sequence
@@ -43,22 +42,29 @@ def main():
 
     # sample training
     model.load_weights('saved_model.h5')
-    model.fit(x=DataLoader(ssd, batch_size=8), epochs=500, initial_epoch=0,
-              callbacks=[ModelCheckpoint(filepath='saved_model.h5', monitor='accuracy_fn', save_best_only=True, save_weights_only=True, verbose=1)])
+    # model.fit(x=DataLoader(ssd, batch_size=8, file='datasets/train/annotations.json'), epochs=500, initial_epoch=0,
+    #           callbacks=[ModelCheckpoint(filepath='saved_model.h5', monitor='accuracy_fn', save_best_only=True, save_weights_only=True, verbose=1)])
+
+    for idx, (image, _) in enumerate(DataLoader(ssd, batch_size=1, file='datasets/test/annotations.json', shuffle=False)):
+        predictions = model.predict(x=image)
+        classes, scores, boxes = ssd.decode_output(predictions[0])
+        ssd.plot_boxes(image[0], classes=classes, scores=scores, boxes=boxes, file_name='output/' + str(idx) + '.png', visualize=False)
 
 
 class DataLoader(Sequence):
-    def __init__(self, model, batch_size=4):
+    def __init__(self, model, file, batch_size=4, shuffle=True):
         self.model = model
         self.batch_size = batch_size
         self.image_shape = self.model.image_shape
-        with open('datasets/train/annotations.json') as data_file:
+        self.shuffle = shuffle
+        with open(file) as data_file:
             self.train_dataset = json.load(data_file)
-            shuffle(self.train_dataset)
+            if shuffle:
+                random.shuffle(self.train_dataset)
 
     def __getitem__(self, index):
-        if index == 0:
-            shuffle(self.train_dataset)
+        if index == 0 and self.shuffle:
+            random.shuffle(self.train_dataset)
         x = []
         y = []
         for train_data in self.train_dataset[index * self.batch_size: (index + 1) * self.batch_size]:

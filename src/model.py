@@ -274,30 +274,32 @@ class SingleShotDetector:
         cx = (predictions[:, self.n_classes + 1:self.n_classes + 2] * self.default_boxes[0][:, 3:4] + self.default_boxes[0][:, 1:2]) * self.image_shape[1]
         h = numpy.exp(predictions[:, self.n_classes + 2:self.n_classes + 3]) * self.default_boxes[0][:, 2:3] * self.image_shape[0]
         w = numpy.exp(predictions[:, self.n_classes + 3:self.n_classes + 4]) * self.default_boxes[0][:, 3:4] * self.image_shape[1]
-        predictions[:, self.n_classes:self.n_classes + 1] = cy - h / 2
-        predictions[:, self.n_classes + 1:self.n_classes + 2] = cy + h / 2
-        predictions[:, self.n_classes + 2:self.n_classes + 3] = cx - w / 2
-        predictions[:, self.n_classes + 3:self.n_classes + 4] = cx + w / 2
+        predictions[:, self.n_classes:self.n_classes + 1] = numpy.clip(cy - h / 2, 0, self.image_shape[0])
+        predictions[:, self.n_classes + 1:self.n_classes + 2] = numpy.clip(cy + h / 2, predictions[:, self.n_classes:self.n_classes + 1], self.image_shape[0])
+        predictions[:, self.n_classes + 2:self.n_classes + 3] = numpy.clip(cx - w / 2, 0, self.image_shape[1])
+        predictions[:, self.n_classes + 3:self.n_classes + 4] = numpy.clip(cx + w / 2, predictions[:, self.n_classes + 2:self.n_classes + 3], self.image_shape[1])
 
+        predictions = predictions[numpy.any(predictions[:, self.n_classes + 1:self.n_classes + 2] - predictions[:, self.n_classes:self.n_classes + 1] > 1, axis=1)]
+        predictions = predictions[numpy.any(predictions[:, self.n_classes + 3:self.n_classes + 4] - predictions[:, self.n_classes + 2:self.n_classes + 3] > 1, axis=1)]
         predictions = predictions[numpy.any(predictions[:, :self.n_classes] > self.class_conf_threshold, axis=1)]
-        predictions = predictions[numpy.argsort(numpy.amax(predictions[:, :self.n_classes], axis=1), axis=0)][::-1][:self.n_classes * 10]
+        predictions = predictions[numpy.argsort(numpy.amax(predictions[:, :self.n_classes], axis=1), axis=0)][::-1][:100]  # top 100 only
         classes, scores, boxes = [], [], []
         prev_predictions = {}
         for prediction in predictions:
             if numpy.any(prediction[self.n_classes:] < 0):
                 continue
             predicted_class = numpy.argmax(prediction[:self.n_classes])
+            any_match = False
             if predicted_class in prev_predictions.keys():
-                if self.intersection_over_union(prev_predictions[predicted_class], prediction[self.n_classes:]) > self.jaccard_similarity_threshold:
-                    classes.append(predicted_class)
-                    scores.append(prediction[predicted_class])
-                    boxes.append(prediction[self.n_classes:])
-                    prev_predictions[predicted_class] = prediction[self.n_classes:]
-            else:
+                for prev_prediction in prev_predictions[predicted_class]:
+                    if self.intersection_over_union(prev_prediction, prediction[self.n_classes:]) > self.jaccard_similarity_threshold:
+                        any_match = True
+                        break
+            if not any_match:
                 classes.append(predicted_class)
                 scores.append(prediction[predicted_class])
                 boxes.append(prediction[self.n_classes:])
-                prev_predictions[predicted_class] = prediction[self.n_classes:]
+                prev_predictions.get(predicted_class, []).append(prediction[self.n_classes:])
         return numpy.array(classes), numpy.array(scores), numpy.array(boxes)
 
     def encode_input(self, ground_truth_boxes):
@@ -377,10 +379,10 @@ class SingleShotDetector:
                 score = scores[i]
                 if cls_id not in colors:
                     colors[cls_id] = (random(), random(), random())
-                ymin = int(boxes[i, 0])
-                xmin = int(boxes[i, 1])
-                ymax = int(boxes[i, 2])
-                xmax = int(boxes[i, 3])
+                ymin = int(numpy.clip(boxes[i, 0], 0, self.image_shape[0]))
+                xmin = int(numpy.clip(boxes[i, 1], 0, self.image_shape[1]))
+                ymax = int(numpy.clip(boxes[i, 2], ymin, self.image_shape[0]))
+                xmax = int(numpy.clip(boxes[i, 3], xmin, self.image_shape[1]))
                 rect = pyplot.Rectangle((xmin, ymin), xmax - xmin, ymax - ymin, fill=False, edgecolor=colors[cls_id], linewidth=line_width)
                 pyplot.gca().add_patch(rect)
                 class_name = str(cls_id)

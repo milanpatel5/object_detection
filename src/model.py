@@ -189,7 +189,9 @@ class SingleShotDetector:
         # Fixed set of default boxes with different scales and aspect ratios (Other random generation method can be used)
         self.default_box_scales = [(0, 0), (0, 1), (1, 0), (1, 1), (2, 0), (0, 2), (1, 2), (2, 1), (2, 2)][:n_boxes]
         self.default_boxes = None
-        self.accuracy = None
+        self.accuracy_data = None
+        self.precision_data = None
+        self.recall_data = None
 
     def __call__(self, base_1, base_2):
         # Extract features of varying scales from input of base model
@@ -242,8 +244,13 @@ class SingleShotDetector:
         true_idx = argmax(y_true[:, :, :self.n_classes + 1])
         pred_idx = cast(any(y_pred[:, :, :self.n_classes] > self.class_conf_threshold, axis=-1), int64)
         pred_idx = pred_idx * (argmax(y_pred[:, :, :self.n_classes]) + 1)
-        self.accuracy = cast(equal(true_idx, pred_idx), floatx())
-        del true_idx, pred_idx
+        self.accuracy_data = cast(equal(true_idx, pred_idx), floatx())
+
+        # calculating precision-recall
+        true_positives = sum(cast(true_idx > 0, floatx()) * cast(pred_idx > 0, floatx()))
+        self.precision_data = true_positives / sum(cast(true_idx > 0, floatx()))
+        self.recall_data = true_positives / sum(cast(pred_idx > 0, floatx()))
+        del true_idx, pred_idx, true_positives
 
         # calculating losses
         classification_loss = categorical_crossentropy(y_true=y_true[:, :, 1:self.n_classes + 1], y_pred=y_pred[:, :, :self.n_classes])
@@ -266,8 +273,14 @@ class SingleShotDetector:
         loss = mean(loss, axis=0)
         return loss
 
-    def accuracy_fn(self, y_true, y_pred):
-        return self.accuracy
+    def accuracy(self, y_true, y_pred):
+        return self.accuracy_data
+
+    def precision(self, y_true, y_pred):
+        return self.precision_data
+
+    def recall(self, y_true, y_pred):
+        return self.recall_data
 
     def decode_output(self, predictions):
         cy = (predictions[:, self.n_classes:self.n_classes + 1] * self.default_boxes[0][:, 2:3] + self.default_boxes[0][:, 0:1]) * self.image_shape[0]

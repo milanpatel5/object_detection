@@ -5,8 +5,8 @@ import time
 import warnings
 from math import ceil
 
-import cv2
 import numpy
+from cv2 import cv2
 from dateutil.relativedelta import relativedelta
 from tensorflow.python.keras import Input
 from tensorflow.python.keras.callbacks import ModelCheckpoint
@@ -15,6 +15,45 @@ from tensorflow.python.keras.optimizer_v2.adam import Adam
 from tensorflow.python.keras.utils.data_utils import Sequence
 
 from model import SingleShotDetector, MobileNetV2
+
+
+class DataLoader(Sequence):
+    def __init__(self, model, file, batch_size=4, shuffle=True):
+        self.model = model
+        self.batch_size = batch_size
+        self.image_shape = self.model.image_shape
+        self.shuffle = shuffle
+        self.train_dataset = []
+        with open(file) as data_file:
+            json_data = json.load(data_file)
+            for train_data in json_data:
+                image_path = train_data['path']
+                ground_truth_boxes = []
+                for obj in train_data['annotations']:
+                    loc = obj['coordinates']
+                    label = obj['label']
+                    cy = loc['y'] / self.image_shape[0]
+                    cx = loc['x'] / self.image_shape[1]
+                    h = loc['height'] / self.image_shape[0]
+                    w = loc['width'] / self.image_shape[1]
+                    ground_truth_boxes.append([cy, cx, h, w, int(label)])
+                self.train_dataset.append((image_path, self.model.encode_input(numpy.array(ground_truth_boxes, copy=False))))
+
+            if shuffle:
+                random.shuffle(self.train_dataset)
+
+    def __getitem__(self, index):
+        if index == 0 and self.shuffle:
+            random.shuffle(self.train_dataset)
+        x = []
+        y = []
+        for data in self.train_dataset[self.batch_size * index:self.batch_size * (index + 1)]:
+            x.append(cv2.imread(data[0]))
+            y.append(data[1])
+        return numpy.array(x, copy=False), numpy.array(y, copy=False)
+
+    def __len__(self):
+        return ceil(len(self.train_dataset) / self.batch_size)
 
 
 def main():
@@ -43,49 +82,15 @@ def main():
 
     # sample training
     model.load_weights('saved_model.h5')
-    model.fit(x=DataLoader(ssd, batch_size=12, file='datasets/train/annotations.json'), epochs=500, initial_epoch=0,
+    model.fit(x=DataLoader(ssd, batch_size=12, file='datasets/train/annotations.json'), epochs=500, initial_epoch=394,
               callbacks=[ModelCheckpoint(filepath='saved_model.h5', monitor='accuracy', save_best_only=False, save_weights_only=True, verbose=0)])
 
-    # model.load_weights('saved_model.h5')
-    # for idx, (image, _) in enumerate(DataLoader(ssd, batch_size=1, file='datasets/test/annotations.json', shuffle=False)):
-    #     predictions = model.predict(x=image)
-    #     classes, scores, boxes = ssd.decode_output(predictions[0])
-    #     ssd.plot_boxes(image[0], classes=classes, scores=scores, boxes=boxes, file_name='output/' + str(idx) + '.png', visualize=False)
-
-
-class DataLoader(Sequence):
-    def __init__(self, model, file, batch_size=4, shuffle=True):
-        self.model = model
-        self.batch_size = batch_size
-        self.image_shape = self.model.image_shape
-        self.shuffle = shuffle
-        with open(file) as data_file:
-            self.train_dataset = json.load(data_file)
-            if shuffle:
-                random.shuffle(self.train_dataset)
-
-    def __getitem__(self, index):
-        if index == 0 and self.shuffle:
-            random.shuffle(self.train_dataset)
-        x = []
-        y = []
-        for train_data in self.train_dataset[index * self.batch_size: (index + 1) * self.batch_size]:
-            image_path = train_data['path']
-            ground_truth_boxes = []
-            for obj in train_data['annotations']:
-                loc = obj['coordinates']
-                label = obj['label']
-                cy = loc['y'] / self.image_shape[0]
-                cx = loc['x'] / self.image_shape[1]
-                h = loc['height'] / self.image_shape[0]
-                w = loc['width'] / self.image_shape[1]
-                ground_truth_boxes.append([cy, cx, h, w, int(label)])
-            x.append(cv2.imread(image_path))
-            y.append(self.model.encode_input(numpy.array(ground_truth_boxes)))
-        return numpy.array(x), numpy.array(y)
-
-    def __len__(self):
-        return ceil(len(self.train_dataset) / self.batch_size)
+    # testing
+    model.load_weights('saved_model.h5')
+    for idx, (image, _) in enumerate(DataLoader(ssd, batch_size=1, file='datasets/test/annotations.json', shuffle=False)):
+        predictions = model.predict(x=image)
+        classes, scores, boxes = ssd.decode_output(predictions[0])
+        ssd.plot_boxes(image[0], classes=classes, scores=scores, boxes=boxes, file_name='output/' + str(idx) + '.png', visualize=False)
 
 
 if __name__ == '__main__':

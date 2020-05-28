@@ -248,8 +248,8 @@ class SingleShotDetector:
 
         # calculating precision-recall
         true_positives = sum(cast(true_idx > 0, floatx()) * cast(pred_idx > 0, floatx()))
-        self.precision_data = true_positives / sum(cast(true_idx > 0, floatx()))
-        self.recall_data = true_positives / sum(cast(pred_idx > 0, floatx()))
+        self.precision_data = true_positives / sum(cast(pred_idx > 0, floatx()))
+        self.recall_data = true_positives / sum(cast(true_idx > 0, floatx()))
         del true_idx, pred_idx, true_positives
 
         # calculating losses

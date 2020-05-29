@@ -66,7 +66,7 @@ def main():
     input = Input(shape=image_shape)
 
     # Initialize SSD class object
-    ssd = SingleShotDetector(image_shape=image_shape, n_classes=10, loc_loss_weight=0.75, class_conf_threshold=0.9)
+    ssd = SingleShotDetector(image_shape=image_shape, n_classes=10, loc_loss_weight=0.75, class_conf_threshold=0.9, n_boxes=6, jaccard_similarity_threshold=0.3)
 
     # Fetch features from base model and then pass them to SSD model for predictions
     base_1, base_2 = MobileNetV2()(input)
@@ -75,22 +75,23 @@ def main():
     # Creation of model object based on input tensor and output tensor from SSD
     model = Model(input, output)
     # Compile model with specified loss method
-    model.compile(optimizer=RMSprop(centered=True), loss=ssd.loss_fn, metrics=[ssd.accuracy, ssd.precision, ssd.recall])
+    model.compile(optimizer=RMSprop(centered=True, momentum=0.9), loss=ssd.loss_fn, metrics=[ssd.accuracy, ssd.precision, ssd.recall])
     # Printing model summary to stdout
     # model.summary()
     # plot_model(model=model, show_shapes=True, expand_nested=True, dpi=96, to_file='model.png')
 
     # sample training
     model_checkpoint_file = 'saved_model.h5'
-    model.load_weights(model_checkpoint_file)
-    model.fit(x=DataLoader(ssd, batch_size=8, file='datasets/train/annotations.json'), epochs=1500, initial_epoch=895,
+    # model.load_weights(model_checkpoint_file)
+    model.fit(x=DataLoader(ssd, batch_size=8, file='datasets/train/annotations.json'), epochs=1000, initial_epoch=0,
               callbacks=[ModelCheckpoint(filepath=model_checkpoint_file, monitor='accuracy', save_best_only=False, save_weights_only=True, verbose=0)])
 
     # testing
     model.load_weights('saved_model.h5')
-    for idx, (image, _) in enumerate(DataLoader(ssd, batch_size=1, file='datasets/test/annotations.json', shuffle=False)):
+    for idx, (image, temp) in enumerate(DataLoader(ssd, batch_size=1, file='datasets/test/annotations.json', shuffle=False)):
         predictions = model.predict(x=image)
         classes, scores, boxes = ssd.decode_output(predictions[0])
+        # classes, scores, boxes = ssd.decode_output(temp[0, :, 1:])
         ssd.plot_boxes(image[0], classes=classes, scores=scores, boxes=boxes, file_name='output/' + str(idx) + '.png', visualize=False)
 
 

@@ -9,6 +9,7 @@ import numpy
 from cv2 import cv2
 from dateutil.relativedelta import relativedelta
 from tensorflow.python.keras import Input
+from tensorflow.python.keras.callbacks import ModelCheckpoint
 from tensorflow.python.keras.models import Model
 from tensorflow.python.keras.optimizer_v2.rmsprop import RMSprop
 from tensorflow.python.keras.utils.data_utils import Sequence
@@ -80,9 +81,10 @@ def main():
     # plot_model(model=model, show_shapes=True, expand_nested=True, dpi=96, to_file='model.png')
 
     # sample training
-    # model.load_weights('saved_model.h5')
-    # model.fit(x=DataLoader(ssd, batch_size=8, file='datasets/train/annotations.json'), epochs=1000, initial_epoch=350,
-    #           callbacks=[ModelCheckpoint(filepath='saved_model.h5', monitor='accuracy', save_best_only=False, save_weights_only=True, verbose=0)])
+    model_checkpoint_file = 'saved_model.h5'
+    model.load_weights(model_checkpoint_file)
+    model.fit(x=DataLoader(ssd, batch_size=8, file='datasets/train/annotations.json'), epochs=1500, initial_epoch=895,
+              callbacks=[ModelCheckpoint(filepath=model_checkpoint_file, monitor='accuracy', save_best_only=False, save_weights_only=True, verbose=0)])
 
     # testing
     model.load_weights('saved_model.h5')

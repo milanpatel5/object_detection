@@ -75,16 +75,16 @@ def main():
     # Creation of model object based on input tensor and output tensor from SSD
     model = Model(input, output)
     # Compile model with specified loss method
-    model.compile(optimizer=RMSprop(centered=True, momentum=0.75, learning_rate=0.002), loss=ssd.loss_fn, metrics=[ssd.accuracy, ssd.precision, ssd.recall])
+    model.compile(optimizer=RMSprop(centered=True, momentum=0.9, learning_rate=0.001), loss=ssd.loss_fn, metrics=[ssd.accuracy, ssd.precision, ssd.recall])
     # Printing model summary to stdout
     # model.summary()
     # plot_model(model=model, show_shapes=True, expand_nested=True, dpi=96, to_file='model.png')
 
     # sample training
-    # model_checkpoint_file = 'saved_model.h5'
-    # model.load_weights(model_checkpoint_file)
-    # model.fit(x=DataLoader(ssd, batch_size=8, file='datasets/train/annotations.json'), epochs=1000, initial_epoch=220,
-    #           callbacks=[ModelCheckpoint(filepath=model_checkpoint_file, monitor='accuracy', save_best_only=False, save_weights_only=True, verbose=0)])
+    model_checkpoint_file = 'saved_model.h5'
+    model.load_weights(model_checkpoint_file)
+    model.fit(x=DataLoader(ssd, batch_size=8, file='datasets/train/annotations.json'), epochs=1000, initial_epoch=250,
+              callbacks=[ModelCheckpoint(filepath=model_checkpoint_file, monitor='accuracy', save_best_only=False, save_weights_only=True, verbose=0)])
 
     # testing
     model.load_weights('saved_model.h5')

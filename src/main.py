@@ -81,10 +81,10 @@ def main():
     # plot_model(model=model, show_shapes=True, expand_nested=True, dpi=96, to_file='model.png')
 
     # sample training
-    model_checkpoint_file = 'saved_model.h5'
-    model.load_weights(model_checkpoint_file)
-    model.fit(x=DataLoader(ssd, batch_size=8, file='datasets/train/annotations.json'), epochs=100, initial_epoch=0,
-              callbacks=[ModelCheckpoint(filepath=model_checkpoint_file, monitor='accuracy', save_best_only=True, save_weights_only=True, verbose=1)])
+    # model_checkpoint_file = 'saved_model.h5'
+    # model.load_weights(model_checkpoint_file)
+    # model.fit(x=DataLoader(ssd, batch_size=8, file='datasets/train/annotations.json'), epochs=100, initial_epoch=4,
+    #           callbacks=[ModelCheckpoint(filepath=model_checkpoint_file, monitor='accuracy', save_best_only=True, save_weights_only=True, verbose=1)])
 
     # testing
     model.load_weights('saved_model.h5')

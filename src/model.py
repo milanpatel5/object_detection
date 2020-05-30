@@ -402,7 +402,7 @@ class SingleShotDetector:
                 rect = pyplot.Rectangle((xmin, ymin), width=xmax - xmin, height=ymax - ymin, fill=False, edgecolor=colors[cls_id], linewidth=line_width)
                 pyplot.gca().add_patch(rect)
                 class_name = str(cls_id)
-                pyplot.gca().text(xmin, ymin + 5, '{:s}|{:.2f}'.format(class_name, score), bbox=dict(facecolor=colors[cls_id], alpha=0.5), fontsize=8, color='white')
+                pyplot.gca().text(xmin + 5, max(ymin - 5, 0), '{:s}|{:.2f}'.format(class_name, score), bbox=dict(facecolor=colors[cls_id], alpha=0.5), fontsize=8, color='white')
         img_ax.figure.savefig(file_name, dpi=500)
         if visualize:
             pyplot.show()

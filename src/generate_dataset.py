@@ -64,7 +64,10 @@ def get_group_obj_positions(obj_group, bkg):
     bkg_w, bkg_h = bkg.size
     boxes = []
     objs = [Image.open(objs_path + obj_images[i]) for i in obj_group]
-    obj_sizes = [tuple([int(random.randint(1, 4) * x) for x in i.size]) for i in objs]
+    obj_sizes = []
+    for obj in objs:
+        random_scale = random.randint(1, 4)
+        obj_sizes.append(tuple([sz * random_scale for sz in obj.size]))
     for w, h in obj_sizes:
         # set background image boundaries
         max_x, max_y = bkg_w - w, bkg_h - h
@@ -233,5 +236,5 @@ def generate(output_path, single_obj_count=1, multi_object_count=100):
 
 
 if __name__ == "__main__":
-    generate(output_path=args.output + 'train/', single_obj_count=4, multi_object_count=500)
+    generate(output_path=args.output + 'train/', single_obj_count=4, multi_object_count=10000)
     generate(output_path=args.output + 'test/', single_obj_count=1, multi_object_count=10)

@@ -4,10 +4,10 @@
     "annotations": [
       {
         "coordinates": {
-          "height": 28,
+          "height": 84,
           "width": 28,
-          "x": 389.0,
-          "y": 204.0
+          "x": 402.0,
+          "y": 229.0
         },
         "label": "0"
       }
@@ -18,10 +18,10 @@
     "annotations": [
       {
         "coordinates": {
-          "height": 28,
-          "width": 84,
-          "x": 88.0,
-          "y": 153.0
+          "height": 112,
+          "width": 112,
+          "x": 120.0,
+          "y": 446.0
         },
         "label": "1"
       }
@@ -32,10 +32,10 @@
     "annotations": [
       {
         "coordinates": {
-          "height": 28,
-          "width": 112,
-          "x": 442.0,
-          "y": 360.0
+          "height": 112,
+          "width": 56,
+          "x": 204.0,
+          "y": 302.0
         },
         "label": "2"
       }
@@ -46,10 +46,10 @@
     "annotations": [
       {
         "coordinates": {
-          "height": 56,
-          "width": 56,
-          "x": 309.0,
-          "y": 460.0
+          "height": 112,
+          "width": 84,
+          "x": 69.0,
+          "y": 418.0
         },
         "label": "3"
       }
@@ -60,10 +60,10 @@
     "annotations": [
       {
         "coordinates": {
-          "height": 28,
-          "width": 56,
-          "x": 103.0,
-          "y": 450.0
+          "height": 84,
+          "width": 28,
+          "x": 388.0,
+          "y": 453.0
         },
         "label": "4"
       }
@@ -75,9 +75,9 @@
       {
         "coordinates": {
           "height": 84,
-          "width": 56,
-          "x": 352.0,
-          "y": 221.0
+          "width": 112,
+          "x": 428.0,
+          "y": 188.0
         },
         "label": "5"
       }
@@ -88,10 +88,10 @@
     "annotations": [
       {
         "coordinates": {
-          "height": 84,
-          "width": 56,
-          "x": 256.0,
-          "y": 230.0
+          "height": 56,
+          "width": 84,
+          "x": 338.0,
+          "y": 207.0
         },
         "label": "6"
       }
@@ -103,9 +103,9 @@
       {
         "coordinates": {
           "height": 56,
-          "width": 84,
-          "x": 260.0,
-          "y": 113.0
+          "width": 28,
+          "x": 34.0,
+          "y": 57.0
         },
         "label": "7"
       }
@@ -116,10 +116,10 @@
     "annotations": [
       {
         "coordinates": {
-          "height": 28,
-          "width": 56,
-          "x": 245.0,
-          "y": 477.0
+          "height": 56,
+          "width": 28,
+          "x": 391.0,
+          "y": 341.0
         },
         "label": "8"
       }
@@ -130,10 +130,10 @@
     "annotations": [
       {
         "coordinates": {
-          "height": 112,
+          "height": 56,
           "width": 28,
-          "x": 120.0,
-          "y": 235.0
+          "x": 360.0,
+          "y": 387.0
         },
         "label": "9"
       }
@@ -144,39 +144,21 @@
     "annotations": [
       {
         "coordinates": {
-          "height": 28,
-          "width": 112,
-          "x": 273,
-          "y": 497
+          "height": 56,
+          "width": 56,
+          "x": 427,
+          "y": 300
         },
         "label": "5"
       },
       {
         "coordinates": {
           "height": 56,
-          "width": 112,
-          "x": 446,
-          "y": 284
-        },
-        "label": "6"
-      },
-      {
-        "coordinates": {
-          "height": 112,
-          "width": 28,
-          "x": 434,
-          "y": 396
-        },
-        "label": "2"
-      },
-      {
-        "coordinates": {
-          "height": 56,
           "width": 56,
-          "x": 226,
-          "y": 48
+          "x": 172,
+          "y": 164
         },
-        "label": "1"
+        "label": "8"
       }
     ]
   },
@@ -185,30 +167,30 @@
     "annotations": [
       {
         "coordinates": {
-          "height": 112,
-          "width": 112,
-          "x": 85,
-          "y": 256
-        },
-        "label": "2"
-      },
-      {
-        "coordinates": {
-          "height": 112,
-          "width": 56,
-          "x": 154,
-          "y": 127
-        },
-        "label": "7"
-      },
-      {
-        "coordinates": {
-          "height": 112,
+          "height": 84,
           "width": 84,
-          "x": 355,
-          "y": 349
+          "x": 369,
+          "y": 346
         },
-        "label": "6"
+        "label": "3"
+      },
+      {
+        "coordinates": {
+          "height": 84,
+          "width": 84,
+          "x": 336,
+          "y": 155
+        },
+        "label": "5"
+      },
+      {
+        "coordinates": {
+          "height": 84,
+          "width": 84,
+          "x": 215,
+          "y": 242
+        },
+        "label": "4"
       }
     ]
   },
@@ -217,21 +199,39 @@
     "annotations": [
       {
         "coordinates": {
-          "height": 84,
-          "width": 84,
-          "x": 274,
-          "y": 58
+          "height": 28,
+          "width": 28,
+          "x": 448,
+          "y": 80
+        },
+        "label": "1"
+      },
+      {
+        "coordinates": {
+          "height": 28,
+          "width": 28,
+          "x": 266,
+          "y": 26
         },
         "label": "7"
       },
       {
         "coordinates": {
-          "height": 112,
-          "width": 84,
-          "x": 421,
-          "y": 427
+          "height": 56,
+          "width": 56,
+          "x": 120,
+          "y": 156
         },
-        "label": "5"
+        "label": "4"
+      },
+      {
+        "coordinates": {
+          "height": 56,
+          "width": 56,
+          "x": 40,
+          "y": 443
+        },
+        "label": "3"
       }
     ]
   },
@@ -240,30 +240,39 @@
     "annotations": [
       {
         "coordinates": {
-          "height": 56,
+          "height": 84,
           "width": 84,
-          "x": 461,
-          "y": 213
+          "x": 132,
+          "y": 128
+        },
+        "label": "3"
+      },
+      {
+        "coordinates": {
+          "height": 84,
+          "width": 84,
+          "x": 121,
+          "y": 248
         },
         "label": "8"
       },
       {
         "coordinates": {
           "height": 28,
-          "width": 56,
-          "x": 249,
-          "y": 463
+          "width": 28,
+          "x": 235,
+          "y": 400
         },
-        "label": "5"
+        "label": "0"
       },
       {
         "coordinates": {
-          "height": 56,
-          "width": 56,
-          "x": 177,
-          "y": 372
+          "height": 84,
+          "width": 84,
+          "x": 322,
+          "y": 116
         },
-        "label": "0"
+        "label": "8"
       }
     ]
   },
@@ -272,30 +281,21 @@
     "annotations": [
       {
         "coordinates": {
-          "height": 28,
-          "width": 28,
-          "x": 296,
-          "y": 368
+          "height": 112,
+          "width": 112,
+          "x": 339,
+          "y": 139
         },
-        "label": "3"
-      },
-      {
-        "coordinates": {
-          "height": 84,
-          "width": 56,
-          "x": 384,
-          "y": 371
-        },
-        "label": "7"
+        "label": "6"
       },
       {
         "coordinates": {
           "height": 28,
           "width": 28,
-          "x": 452,
-          "y": 39
+          "x": 162,
+          "y": 212
         },
-        "label": "4"
+        "label": "8"
       }
     ]
   },
@@ -304,39 +304,30 @@
     "annotations": [
       {
         "coordinates": {
-          "height": 28,
-          "width": 56,
-          "x": 36,
-          "y": 15
-        },
-        "label": "3"
-      },
-      {
-        "coordinates": {
-          "height": 112,
-          "width": 84,
-          "x": 359,
-          "y": 412
-        },
-        "label": "0"
-      },
-      {
-        "coordinates": {
           "height": 84,
-          "width": 112,
-          "x": 380,
-          "y": 100
+          "width": 84,
+          "x": 88,
+          "y": 187
         },
-        "label": "3"
+        "label": "4"
+      },
+      {
+        "coordinates": {
+          "height": 56,
+          "width": 56,
+          "x": 84,
+          "y": 386
+        },
+        "label": "2"
       },
       {
         "coordinates": {
           "height": 112,
-          "width": 84,
-          "x": 239,
-          "y": 75
+          "width": 112,
+          "x": 261,
+          "y": 447
         },
-        "label": "8"
+        "label": "2"
       }
     ]
   },
@@ -346,38 +337,29 @@
       {
         "coordinates": {
           "height": 28,
-          "width": 84,
-          "x": 211,
-          "y": 246
+          "width": 28,
+          "x": 111,
+          "y": 41
         },
         "label": "5"
+      },
+      {
+        "coordinates": {
+          "height": 28,
+          "width": 28,
+          "x": 267,
+          "y": 243
+        },
+        "label": "0"
       },
       {
         "coordinates": {
           "height": 84,
           "width": 84,
-          "x": 184,
-          "y": 447
+          "x": 433,
+          "y": 377
         },
-        "label": "0"
-      },
-      {
-        "coordinates": {
-          "height": 112,
-          "width": 56,
-          "x": 349,
-          "y": 153
-        },
-        "label": "5"
-      },
-      {
-        "coordinates": {
-          "height": 56,
-          "width": 84,
-          "x": 399,
-          "y": 61
-        },
-        "label": "0"
+        "label": "8"
       }
     ]
   },
@@ -388,28 +370,19 @@
         "coordinates": {
           "height": 56,
           "width": 56,
-          "x": 373,
-          "y": 324
+          "x": 92,
+          "y": 264
         },
-        "label": "8"
+        "label": "1"
       },
       {
         "coordinates": {
           "height": 84,
-          "width": 56,
-          "x": 126,
-          "y": 153
+          "width": 84,
+          "x": 357,
+          "y": 141
         },
-        "label": "5"
-      },
-      {
-        "coordinates": {
-          "height": 112,
-          "width": 112,
-          "x": 214,
-          "y": 156
-        },
-        "label": "6"
+        "label": "0"
       }
     ]
   },
@@ -419,38 +392,20 @@
       {
         "coordinates": {
           "height": 28,
-          "width": 112,
-          "x": 412,
-          "y": 15
-        },
-        "label": "8"
-      },
-      {
-        "coordinates": {
-          "height": 28,
           "width": 28,
-          "x": 246,
-          "y": 430
-        },
-        "label": "2"
-      },
-      {
-        "coordinates": {
-          "height": 56,
-          "width": 28,
-          "x": 304,
-          "y": 313
+          "x": 214,
+          "y": 316
         },
         "label": "7"
       },
       {
         "coordinates": {
-          "height": 112,
+          "height": 28,
           "width": 28,
-          "x": 240,
-          "y": 285
+          "x": 416,
+          "y": 142
         },
-        "label": "0"
+        "label": "3"
       }
     ]
   },
@@ -459,37 +414,37 @@
     "annotations": [
       {
         "coordinates": {
-          "height": 84,
-          "width": 28,
-          "x": 33,
-          "y": 124
+          "height": 112,
+          "width": 112,
+          "x": 432,
+          "y": 119
         },
         "label": "2"
       },
       {
         "coordinates": {
-          "height": 56,
+          "height": 112,
           "width": 112,
-          "x": 361,
+          "x": 396,
+          "y": 280
+        },
+        "label": "1"
+      },
+      {
+        "coordinates": {
+          "height": 56,
+          "width": 56,
+          "x": 55,
           "y": 424
         },
-        "label": "6"
+        "label": "1"
       },
       {
         "coordinates": {
-          "height": 84,
+          "height": 112,
           "width": 112,
-          "x": 438,
-          "y": 112
-        },
-        "label": "6"
-      },
-      {
-        "coordinates": {
-          "height": 84,
-          "width": 112,
-          "x": 208,
-          "y": 430
+          "x": 283,
+          "y": 369
         },
         "label": "8"
       }

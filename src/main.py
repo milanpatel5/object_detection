@@ -37,7 +37,7 @@ class DataLoader(Sequence):
                     h = loc['height'] / self.image_shape[0]
                     w = loc['width'] / self.image_shape[1]
                     ground_truth_boxes.append([cy, cx, h, w, int(label)])
-                self.train_dataset.append((cv2.imread(image_path), self.model.encode_input(numpy.array(ground_truth_boxes, copy=False))))
+                self.train_dataset.append((image_path, self.model.encode_input(numpy.array(ground_truth_boxes, copy=False))))
 
             if shuffle:
                 random.shuffle(self.train_dataset)
@@ -48,7 +48,7 @@ class DataLoader(Sequence):
         x = []
         y = []
         for data in self.train_dataset[self.batch_size * index:self.batch_size * (index + 1)]:
-            x.append(data[0])
+            x.append(cv2.imread(data[0]))
             y.append(data[1])
         return numpy.array(x, copy=False), numpy.array(y, copy=False)
 
@@ -83,8 +83,8 @@ def main():
     # sample training
     model_checkpoint_file = 'saved_model.h5'
     model.load_weights(model_checkpoint_file)
-    model.fit(x=DataLoader(ssd, batch_size=8, file='datasets/train/annotations.json'), epochs=1000, initial_epoch=250,
-              callbacks=[ModelCheckpoint(filepath=model_checkpoint_file, monitor='accuracy', save_best_only=False, save_weights_only=True, verbose=0)])
+    model.fit(x=DataLoader(ssd, batch_size=8, file='datasets/train/annotations.json'), epochs=100, initial_epoch=0,
+              callbacks=[ModelCheckpoint(filepath=model_checkpoint_file, monitor='accuracy', save_best_only=True, save_weights_only=True, verbose=1)])
 
     # testing
     model.load_weights('saved_model.h5')

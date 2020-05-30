@@ -325,6 +325,7 @@ class SingleShotDetector:
         :return: anchor_boxes in shape=(total_boxes, 1 + n_classes + 4)
         """
         anchor_boxes = numpy.zeros(shape=(self.default_boxes.shape[1], 1 + self.n_classes + 4), dtype='float32')
+        anchor_boxes[:, :1 + self.n_classes] = 1 / self.n_classes
         anchor_boxes[:, 0] = 1
         # processing each ground_truth_box
         for ground_truth_box in ground_truth_boxes:
@@ -340,7 +341,7 @@ class SingleShotDetector:
             g_box[:2] *= self.image_shape[:2]
             g_box[2:4] *= self.image_shape[:2]
             over_lapping_boxes = self.find_matching_boxes(g_box, numpy.squeeze(over_lapping_boxes, axis=-1))
-            anchor_boxes[over_lapping_boxes, 0] = 0
+            anchor_boxes[over_lapping_boxes, :1 + self.n_classes] = 0
             anchor_boxes[over_lapping_boxes, 1 + class_idx] = 1
             anchor_boxes[over_lapping_boxes, 1 + self.n_classes:] = ground_truth_box[:4]
             anchor_boxes[over_lapping_boxes, 1 + self.n_classes:1 + self.n_classes + 2] -= self.default_boxes[0, over_lapping_boxes, :2]

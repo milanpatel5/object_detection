@@ -4,9 +4,12 @@ import numpy
 from matplotlib import pyplot
 from tensorflow import int64
 from tensorflow.python.framework import ops
+from tensorflow.python.keras import Input
 from tensorflow.python.keras.backend import sum, mean, log, floatx, cast, equal, argmax, any
 from tensorflow.python.keras.layers import Conv2D, BatchNormalization, ReLU, SeparableConv2D, Add, Reshape, Softmax, Concatenate, Multiply
 from tensorflow.python.keras.losses import categorical_crossentropy
+from tensorflow.python.keras.models import Model
+from tensorflow.python.keras.optimizer_v2.rmsprop import RMSprop
 from tensorflow.python.ops import math_ops
 
 
@@ -169,7 +172,7 @@ class Predictors:
 
 
 class SingleShotDetector:
-    def __init__(self, image_shape, class_conf_threshold=0.1, jaccard_similarity_threshold=0.5, n_boxes=4, n_classes=100, loc_loss_weight=1):
+    def __init__(self, image_shape, class_conf_threshold=0.1, jaccard_similarity_threshold=0.5, n_boxes=4, n_classes=100, loc_loss_weight=1.0):
         """
         SingleShotDetector model class
         :param image_shape: a tuple of image shape
@@ -437,3 +440,26 @@ def smooth_l1_loss(y_true, y_pred, delta=1.0):
     linear = math_ops.subtract(abs_error, quadratic)
     return math_ops.add(math_ops.multiply(ops.convert_to_tensor_v2(0.5, dtype=quadratic.dtype), math_ops.multiply(quadratic, quadratic)),
                         math_ops.multiply(delta, linear))
+
+
+def prepare_model():
+    # Input tensor
+    image_shape = (512, 512, 3)
+    input = Input(shape=image_shape)
+
+    # Initialize SSD class object
+    ssd = SingleShotDetector(image_shape=image_shape, n_classes=10, loc_loss_weight=0.75, class_conf_threshold=0.9, n_boxes=6, jaccard_similarity_threshold=0.3)
+
+    # Fetch features from base model and then pass them to SSD model for predictions
+    base_1, base_2 = MobileNetV2()(input)
+    output = ssd(base_1, base_2)
+
+    # Creation of model object based on input tensor and output tensor from SSD
+    model = Model(input, output)
+    # Compile model with specified loss method
+    model.compile(optimizer=RMSprop(centered=True, momentum=0.9, learning_rate=0.001), loss=ssd.loss_fn, metrics=[ssd.accuracy, ssd.precision, ssd.recall])
+    # Printing model summary to stdout
+    # model.summary()
+    # plot_model(model=model, show_shapes=True, expand_nested=True, dpi=96, to_file='model.png')
+
+    return model, ssd

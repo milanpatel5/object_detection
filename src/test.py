@@ -20,7 +20,7 @@ def main():
 
 
 if __name__ == '__main__':
-    os.nice(2)
+    # os.nice(2)
     warnings.filterwarnings('ignore')
     start_time = time.time()
 

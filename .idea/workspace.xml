@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="BranchesTreeState">
+    <expand>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+    </expand>
+    <select />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="c90e83b2-ec64-4199-8c52-1683a828f582" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/0.png" beforeDir="false" afterPath="$PROJECT_DIR$/output/0.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/1.png" beforeDir="false" afterPath="$PROJECT_DIR$/output/1.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/10.png" beforeDir="false" afterPath="$PROJECT_DIR$/output/10.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/11.png" beforeDir="false" afterPath="$PROJECT_DIR$/output/11.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/12.png" beforeDir="false" afterPath="$PROJECT_DIR$/output/12.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/13.png" beforeDir="false" afterPath="$PROJECT_DIR$/output/13.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/14.png" beforeDir="false" afterPath="$PROJECT_DIR$/output/14.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/15.png" beforeDir="false" afterPath="$PROJECT_DIR$/output/15.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/16.png" beforeDir="false" afterPath="$PROJECT_DIR$/output/16.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/17.png" beforeDir="false" afterPath="$PROJECT_DIR$/output/17.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/18.png" beforeDir="false" afterPath="$PROJECT_DIR$/output/18.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/19.png" beforeDir="false" afterPath="$PROJECT_DIR$/output/19.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/2.png" beforeDir="false" afterPath="$PROJECT_DIR$/output/2.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/3.png" beforeDir="false" afterPath="$PROJECT_DIR$/output/3.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/4.png" beforeDir="false" afterPath="$PROJECT_DIR$/output/4.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/5.png" beforeDir="false" afterPath="$PROJECT_DIR$/output/5.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/6.png" beforeDir="false" afterPath="$PROJECT_DIR$/output/6.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/7.png" beforeDir="false" afterPath="$PROJECT_DIR$/output/7.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/8.png" beforeDir="false" afterPath="$PROJECT_DIR$/output/8.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/9.png" beforeDir="false" afterPath="$PROJECT_DIR$/output/9.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/saved_model.h5" beforeDir="false" afterPath="$PROJECT_DIR$/saved_model.h5" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/test.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/train.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/train.py" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ChangesViewManager">
+    <option name="groupingKeys">
+      <option value="directory" />
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GithubPullRequestsUISettings">
+    <option name="hiddenUrls">
+      <set>
+        <option value="git@github.com:milanpatel5/object_detection.git" />
+      </set>
+    </option>
+  </component>
+  <component name="ProjectId" id="1dVDwvUKK7iaoNDWuUqXg64PAxq" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/src/test.py" />
+    <property name="settings.editor.selected.configurable" value="preferences.general" />
+  </component>
+  <component name="RunManager" selected="Python.test">
+    <configuration name="test" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
+      <module name="object_detection" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="C:\Program Files\Python38\python.exe" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/test.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="train" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
+      <module name="object_detection" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="C:\Program Files\Python38\python.exe" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/train.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <list>
+      <item itemvalue="Python.train" />
+      <item itemvalue="Python.test" />
+    </list>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="c90e83b2-ec64-4199-8c52-1683a828f582" name="Default Changelist" comment="" />
+      <created>1592501608213</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1592501608213</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="CUSTOM_BOOLEAN_PROPERTIES">
+                <map>
+                  <entry key="Show.Git.Branches" value="false" />
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="LOCAL_CHANGES_DETAILS_PREVIEW_SHOWN" value="false" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="414" y="175" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1592504224351">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="414" y="175" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1592504224351" />
+    <state x="587" y="88" key="CommitChangelistDialog2" timestamp="1592524825935">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="587" y="88" key="CommitChangelistDialog2/0.0.1920.1040@0.0.1920.1040" timestamp="1592524825935" />
+    <state x="740" y="275" key="FileChooserDialogImpl" timestamp="1592504220914">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="740" y="275" key="FileChooserDialogImpl/0.0.1920.1040@0.0.1920.1040" timestamp="1592504220914" />
+    <state width="1899" height="282" key="GridCell.Tab.0.bottom" timestamp="1592524639716">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1899" height="282" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1592524639716" />
+    <state width="1899" height="282" key="GridCell.Tab.0.center" timestamp="1592524639716">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1899" height="282" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1592524639716" />
+    <state width="1899" height="282" key="GridCell.Tab.0.left" timestamp="1592524639716">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1899" height="282" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1592524639716" />
+    <state width="1899" height="282" key="GridCell.Tab.0.right" timestamp="1592524639716">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1899" height="282" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1592524639716" />
+    <state x="461" y="165" key="SettingsEditor" timestamp="1592503447964">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="461" y="165" key="SettingsEditor/0.0.1920.1040@0.0.1920.1040" timestamp="1592503447964" />
+    <state x="92" y="92" width="1736" height="856" key="com.intellij.history.integration.ui.views.DirectoryHistoryDialog" timestamp="1592526122584">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="92" y="92" width="1736" height="856" key="com.intellij.history.integration.ui.views.DirectoryHistoryDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1592526122584" />
+  </component>
+</project>
